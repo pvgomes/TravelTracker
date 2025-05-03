@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -17,8 +17,10 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { insertVisitSchema } from "@shared/schema";
 import { Link } from "wouter";
+import { Country, State } from "country-state-city";
 
 const formSchema = insertVisitSchema.extend({
   visitDate: z.date({
@@ -41,6 +43,7 @@ interface AddCountryDialogProps {
 
 export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) {
   const { toast } = useToast();
+  const [states, setStates] = useState<any[]>([]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,6 +53,20 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
       state: "",
     },
   });
+  
+  // Fetch states when country changes
+  const selectedCountry = form.watch("countryCode");
+  
+  useEffect(() => {
+    if (selectedCountry) {
+      const countryStates = State.getStatesOfCountry(selectedCountry);
+      setStates(countryStates);
+      // Reset state field when country changes
+      form.setValue("state", "");
+    } else {
+      setStates([]);
+    }
+  }, [selectedCountry, form]);
   
   const addVisitMutation = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
@@ -153,10 +170,28 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
                     </TooltipProvider>
                   </div>
                   <FormControl>
-                    <Input 
-                      placeholder="Enter state or province (optional)" 
-                      {...field} 
-                    />
+                    {states.length > 0 ? (
+                      <Select 
+                        value={field.value} 
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a state/province" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {states.map((state) => (
+                            <SelectItem key={state.isoCode} value={state.name}>
+                              {state.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input 
+                        placeholder="Enter state or province (optional)" 
+                        {...field} 
+                      />
+                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { Visit } from "@shared/schema";
+import { State } from "country-state-city";
 
 // Using a reliable TopoJSON map URL
 const WORLD_MAP_URL = "https://unpkg.com/world-atlas@2.0.2/countries-110m.json";
@@ -188,6 +189,34 @@ interface WorldMapProps {
   homeCountryName?: string;
 }
 
+// Determine if a country has been fully or partially visited
+function getCountryVisitStatus(countryCode: string, visits: Visit[]) {
+  // Get all states for this country
+  const allStates = State.getStatesOfCountry(countryCode);
+  
+  if (!allStates || allStates.length === 0) {
+    // If the country has no states in our database, a single visit means it's fully visited
+    return visits.some(v => v.countryCode === countryCode) ? 'full' : 'none';
+  }
+  
+  // Get all visits for this country
+  const countryVisits = visits.filter(v => v.countryCode === countryCode);
+  
+  if (countryVisits.length === 0) {
+    return 'none'; // No visits to this country
+  }
+  
+  // Get all unique states visited in this country
+  const visitedStates = new Set(countryVisits.map(v => v.state).filter(Boolean));
+  
+  // Check if all states are visited (comparing count is a simplification)
+  if (visitedStates.size >= allStates.length) {
+    return 'full'; // All states visited
+  }
+  
+  return 'partial'; // Some states visited
+}
+
 export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   
@@ -259,20 +288,29 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
               const iso_a2 = (geoProps.iso_a2 || "").toUpperCase();
               const iso_a3 = (geoProps.iso_a3 || "").toUpperCase();
               
-              // Try multiple ways to identify if this country is in our visited list
-              const isVisited = 
-                // Check 2-letter codes
-                visitedCountryData.codes2.has(iso_a2) ||
-                // Check 3-letter codes
-                visitedCountryData.codes3.has(iso_a3) ||
-                // Check by name
-                visitedCountryData.names.has(countryName) ||
-                // Last resort: match against our mapping - for both directions
-                (countryMapping[countryName] && visitedCountryData.codes2.has(countryMapping[countryName][0])) ||
-                // Special case: check exact matches for Malaysia, Brazil, Poland
-                (countryName === "Malaysia" && visitedCountryData.codes2.has("MY")) ||
-                (countryName === "Brazil" && visitedCountryData.codes2.has("BR")) ||
-                (countryName === "Poland" && visitedCountryData.codes2.has("PL"));
+              // Try multiple ways to identify the country code in our map
+              let matchedCountryCode: string | undefined;
+              
+              // Check direct matches
+              if (visitedCountryData.codes2.has(iso_a2)) {
+                matchedCountryCode = iso_a2;
+              } 
+              // Try to find through country mapping
+              else if (countryMapping[countryName] && visitedCountryData.codes2.has(countryMapping[countryName][0])) {
+                matchedCountryCode = countryMapping[countryName][0];
+              }
+              // Special cases
+              else if (countryName === "United States" && visitedCountryData.codes2.has("US")) {
+                matchedCountryCode = "US";
+              } else if (countryName === "Brazil" && visitedCountryData.codes2.has("BR")) {
+                matchedCountryCode = "BR";
+              }
+              
+              // Determine the visit status
+              let visitStatus = 'none';
+              if (matchedCountryCode) {
+                visitStatus = getCountryVisitStatus(matchedCountryCode, visits);
+              }
               
               // Check if this is the home country
               const isHomeCountry = 
@@ -282,21 +320,30 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
                 )) || 
                 (homeCountryName && homeCountryName === countryName);
               
-              // Set different colors based on status
+              // Set different colors and styles based on status
               let fillColor = "#e2e8f0"; // Default (not visited)
               let hoverFillColor = "#bfdbfe";
+              let strokeStyle = "solid";
+              let strokeWidth = 0.5;
+              let strokeColor = "#FFFFFF";
               
               if (isHomeCountry) {
                 fillColor = "#f97316"; // Orange for home country
                 hoverFillColor = "#ea580c";
-              } else if (isVisited) {
-                fillColor = "#10b981"; // Green for visited countries
+              } else if (visitStatus === 'full') {
+                fillColor = "#10b981"; // Green for fully visited countries
                 hoverFillColor = "#059669";
+              } else if (visitStatus === 'partial') {
+                fillColor = "#ddfaea"; // Light green fill for partially visited
+                strokeColor = "#10b981"; // Green border
+                strokeWidth = 1;
+                strokeStyle = "2 2"; // Dotted line
+                hoverFillColor = "#a6f3d6";
               }
               
               // Debug specific countries
-              if (["Malaysia", "Brazil", "Poland"].includes(countryName)) {
-                console.log(`Map country: ${countryName}, ISO-A2: ${iso_a2}, ISO-A3: ${iso_a3}, Is Visited: ${isVisited}`);
+              if (["Malaysia", "Brazil", "Poland", "United States"].includes(countryName)) {
+                console.log(`Map country: ${countryName}, ISO-A2: ${iso_a2}, Status: ${visitStatus}`);
               }
               
               return (
@@ -304,8 +351,9 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
                   key={geo.rsmKey || iso_a3 || countryName}
                   geography={geo}
                   fill={fillColor}
-                  stroke="#FFFFFF"
-                  strokeWidth={0.5}
+                  stroke={strokeColor}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={strokeStyle !== "solid" ? strokeStyle : undefined}
                   style={{
                     default: {
                       fill: fillColor,
