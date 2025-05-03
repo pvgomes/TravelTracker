@@ -1,19 +1,10 @@
-import { useAuth } from "@/hooks/use-auth";
+import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { GlobeIcon, LogOut, Settings, User } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { Visit } from "@shared/schema";
+import { useAuth } from "@/hooks/use-auth";
 
+// Simplified header to avoid potential issues
 export function Header() {
   const { user, logoutMutation } = useAuth();
-  
-  const { data: visits = [] } = useQuery<Visit[]>({
-    queryKey: ["/api/visits"],
-  });
-  
-  const countriesVisited = visits.length;
   
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -30,46 +21,14 @@ export function Header() {
           </div>
           
           <div className="flex items-center">
-            <span className="hidden md:inline-flex items-center px-4 py-2 text-sm font-montserrat text-muted-foreground">
-              <GlobeIcon className="mr-2 text-primary h-4 w-4" />
-              <span>{countriesVisited}</span> countries visited
-            </span>
-            
-            <div className="ml-4 relative flex-shrink-0">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        A
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">Adam</p>
-                      <p className="text-xs text-muted-foreground">{user?.username}</p>
-                    </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            {user ? (
+              <Button variant="ghost" onClick={handleLogout} className="text-sm">
+                <LogOut className="mr-2 h-4 w-4" />
+                Log out
+              </Button>
+            ) : (
+              <span className="text-sm text-muted-foreground">Not logged in</span>
+            )}
           </div>
         </div>
       </div>
