@@ -1,6 +1,7 @@
 import { Visit } from "@shared/schema";
 import { Card, CardContent } from "@/components/ui/card";
-import { GlobeIcon, MapIcon, PercentIcon, CalendarIcon } from "lucide-react";
+import { GlobeIcon, MapIcon, PercentIcon, CalendarIcon, ClipboardListIcon } from "lucide-react";
+import { State } from "country-state-city";
 import { format } from "date-fns";
 
 // Map continents to countries for statistics
@@ -61,9 +62,48 @@ interface StatsOverviewProps {
   visits: Visit[];
 }
 
+// Function to determine if a country has been fully or partially visited
+function getCountryVisitStatus(countryCode: string, visits: Visit[]) {
+  // Get all states for this country
+  const allStates = State.getStatesOfCountry(countryCode);
+  
+  if (!allStates || allStates.length === 0) {
+    // If the country has no states in our database, a single visit means it's fully visited
+    return visits.some(v => v.countryCode === countryCode) ? 'full' : 'none';
+  }
+  
+  // Get all visits for this country
+  const countryVisits = visits.filter(v => v.countryCode === countryCode);
+  
+  if (countryVisits.length === 0) {
+    return 'none'; // No visits to this country
+  }
+  
+  // Get all unique states visited in this country
+  const visitedStates = new Set(countryVisits.map(v => v.state).filter(Boolean));
+  
+  // Check if all states are visited (comparing count is a simplification)
+  if (visitedStates.size >= allStates.length) {
+    return 'full'; // All states visited
+  }
+  
+  return 'partial'; // Some states visited
+}
+
 export function StatsOverview({ visits }: StatsOverviewProps) {
-  // Countries visited
-  const countriesVisited = visits.length;
+  // Get unique country codes
+  const countryCodesSet = new Set(visits.map(visit => visit.countryCode));
+  const uniqueCountryCodes = Array.from(countryCodesSet);
+  
+  // Categorize countries by visit status
+  const visitStats = uniqueCountryCodes.reduce((acc: Record<string, number>, code) => {
+    const status = getCountryVisitStatus(code, visits);
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, { full: 0, partial: 0, none: 0 });
+  
+  // Total countries visited (fully or partially)
+  const countriesVisited = visitStats.full + visitStats.partial;
   
   // Continents explored
   const visitedContinents = new Set(
@@ -97,7 +137,7 @@ export function StatsOverview({ visits }: StatsOverviewProps) {
     : "None yet";
   
   return (
-    <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center">
@@ -107,6 +147,24 @@ export function StatsOverview({ visits }: StatsOverviewProps) {
             <div className="ml-5 w-0 flex-1">
               <div className="text-sm font-medium text-muted-foreground truncate">Countries Visited</div>
               <div className="text-lg font-semibold">{countriesVisited}</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0 bg-[#10b981] rounded-md p-3">
+              <ClipboardListIcon className="h-5 w-5 text-white" />
+            </div>
+            <div className="ml-5 w-0 flex-1">
+              <div className="text-sm font-medium text-muted-foreground truncate">Visit Status</div>
+              <div className="text-sm">
+                <span className="text-lg font-semibold">{visitStats.full}</span> Full
+                <span className="mx-1">·</span>
+                <span className="text-lg font-semibold">{visitStats.partial}</span> Partial
+              </div>
             </div>
           </div>
         </CardContent>

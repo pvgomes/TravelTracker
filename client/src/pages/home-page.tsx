@@ -33,17 +33,28 @@ export default function HomePage() {
       <div className="mt-6 bg-white dark:bg-card overflow-hidden shadow rounded-lg p-4">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-medium">Your World Map</h3>
-          <div className="text-sm text-muted-foreground flex items-center">
-            <span className="inline-block w-3 h-3 bg-secondary rounded-full mr-1"></span>
-            <span className="mr-3">Visited</span>
+          <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-y-1">
+            <div className="flex items-center mr-2">
+              <span className="inline-block w-3 h-3 bg-[#10b981] rounded-full mr-1"></span>
+              <span>Fully visited</span>
+            </div>
+            <div className="flex items-center mr-2">
+              <span className="inline-block w-4 h-3 mr-1 rounded-sm" style={{ 
+                backgroundColor: "#ddfaea", 
+                border: "1px dashed #10b981"
+              }}></span>
+              <span>Partially visited</span>
+            </div>
             {user?.homeCountryCode && (
-              <>
+              <div className="flex items-center mr-2">
                 <span className="inline-block w-3 h-3 bg-orange-500 rounded-full mr-1"></span>
-                <span className="mr-3">Home Country</span>
-              </>
+                <span>Home Country</span>
+              </div>
             )}
-            <span className="inline-block w-3 h-3 bg-neutral-200 dark:bg-muted rounded-full mr-1"></span>
-            <span>Not visited yet</span>
+            <div className="flex items-center">
+              <span className="inline-block w-3 h-3 bg-neutral-200 dark:bg-muted rounded-full mr-1"></span>
+              <span>Not visited</span>
+            </div>
           </div>
         </div>
         
