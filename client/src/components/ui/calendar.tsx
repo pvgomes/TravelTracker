@@ -1,9 +1,23 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
+import { format, getYear, getMonth, addMonths, addYears, setMonth, setYear } from "date-fns"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select"
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
@@ -13,22 +27,179 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
+  const [date, setDate] = React.useState<Date>(props.defaultMonth || new Date())
+  const [isYearPickerOpen, setIsYearPickerOpen] = React.useState(false)
+  
+  // Update our state when props change
+  React.useEffect(() => {
+    if (props.month) {
+      setDate(props.month)
+    }
+  }, [props.month])
+
+  // Create a range of years
+  const currentYear = new Date().getFullYear()
+  const startYear = currentYear - 50
+  const endYear = currentYear + 10
+  const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i)
+  
+  // Navigate by month and year
+  const handlePrevMonth = () => {
+    const newDate = addMonths(date, -1)
+    setDate(newDate)
+    props.onMonthChange?.(newDate)
+  }
+  
+  const handleNextMonth = () => {
+    const newDate = addMonths(date, 1)
+    setDate(newDate)
+    props.onMonthChange?.(newDate)
+  }
+  
+  const handlePrevYear = () => {
+    const newDate = addYears(date, -1)
+    setDate(newDate)
+    props.onMonthChange?.(newDate)
+  }
+  
+  const handleNextYear = () => {
+    const newDate = addYears(date, 1)
+    setDate(newDate)
+    props.onMonthChange?.(newDate)
+  }
+  
+  const handleYearSelect = (year: string) => {
+    const newDate = setYear(date, parseInt(year))
+    setDate(newDate)
+    props.onMonthChange?.(newDate)
+    setIsYearPickerOpen(false)
+  }
+  
+  const handleMonthSelect = (monthIndex: number) => {
+    const newDate = setMonth(date, monthIndex)
+    setDate(newDate)
+    props.onMonthChange?.(newDate)
+  }
+  
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ]
+  
+  // Custom header with year picker
+  const CustomCaption = () => {
+    return (
+      <div className="flex items-center justify-between px-1 py-2">
+        <div className="flex">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-7 w-7 bg-transparent p-0 mr-1 opacity-50 hover:opacity-100"
+            onClick={handlePrevYear}
+            title="Previous Year"
+          >
+            <span className="sr-only">Previous Year</span>
+            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 -ml-2" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+            onClick={handlePrevMonth}
+            title="Previous Month"
+          >
+            <span className="sr-only">Previous Month</span>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <div className="flex items-center gap-1">
+          <Select 
+            value={String(getMonth(date))} 
+            onValueChange={(value) => handleMonthSelect(parseInt(value))}
+          >
+            <SelectTrigger className="h-8 pr-1 focus:ring-0">
+              <SelectValue>{monthNames[getMonth(date)]}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {monthNames.map((month, index) => (
+                <SelectItem key={month} value={String(index)}>
+                  {month}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Popover open={isYearPickerOpen} onOpenChange={setIsYearPickerOpen}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="h-8 pl-2 pr-1 font-normal"
+                onClick={() => setIsYearPickerOpen(true)}
+              >
+                {getYear(date)}
+                <ChevronRight className="h-4 w-4 opacity-50 ml-1" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-52 p-0" align="start">
+              <div className="h-60 overflow-y-auto">
+                <div className="grid grid-cols-3 gap-1 p-2">
+                  {years.map((year) => (
+                    <Button
+                      key={year}
+                      variant={year === getYear(date) ? "default" : "ghost"}
+                      className="h-8"
+                      onClick={() => handleYearSelect(year.toString())}
+                    >
+                      {year}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+        
+        <div className="flex">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+            onClick={handleNextMonth}
+            title="Next Month"
+          >
+            <span className="sr-only">Next Month</span>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-7 w-7 bg-transparent p-0 ml-1 opacity-50 hover:opacity-100"
+            onClick={handleNextYear}
+            title="Next Year"
+          >
+            <span className="sr-only">Next Year</span>
+            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 -ml-2" />
+          </Button>
+        </div>
+      </div>
+    )
+  }
+  
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
+      month={date}
+      onMonthChange={setDate}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium",
-        nav: "space-x-1 flex items-center",
-        nav_button: cn(
-          buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-        ),
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
+        caption_label: "hidden",
+        nav: "hidden",
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
         head_cell:
@@ -52,12 +223,7 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn("h-4 w-4", className)} {...props} />
-        ),
-        IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn("h-4 w-4", className)} {...props} />
-        ),
+        Caption: CustomCaption,
       }}
       {...props}
     />
