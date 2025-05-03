@@ -184,9 +184,11 @@ const countryMapping: Record<string, string[]> = {
 
 interface WorldMapProps {
   visits: Visit[];
+  homeCountryCode?: string;
+  homeCountryName?: string;
 }
 
-export function WorldMap({ visits }: WorldMapProps) {
+export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   
   // For responsiveness
@@ -272,6 +274,26 @@ export function WorldMap({ visits }: WorldMapProps) {
                 (countryName === "Brazil" && visitedCountryData.codes2.has("BR")) ||
                 (countryName === "Poland" && visitedCountryData.codes2.has("PL"));
               
+              // Check if this is the home country
+              const isHomeCountry = 
+                (homeCountryCode && (
+                  iso_a2 === homeCountryCode || 
+                  (countryMapping[countryName] && countryMapping[countryName][0] === homeCountryCode)
+                )) || 
+                (homeCountryName && homeCountryName === countryName);
+              
+              // Set different colors based on status
+              let fillColor = "#e2e8f0"; // Default (not visited)
+              let hoverFillColor = "#bfdbfe";
+              
+              if (isHomeCountry) {
+                fillColor = "#f97316"; // Orange for home country
+                hoverFillColor = "#ea580c";
+              } else if (isVisited) {
+                fillColor = "#10b981"; // Green for visited countries
+                hoverFillColor = "#059669";
+              }
+              
               // Debug specific countries
               if (["Malaysia", "Brazil", "Poland"].includes(countryName)) {
                 console.log(`Map country: ${countryName}, ISO-A2: ${iso_a2}, ISO-A3: ${iso_a3}, Is Visited: ${isVisited}`);
@@ -281,21 +303,21 @@ export function WorldMap({ visits }: WorldMapProps) {
                 <Geography
                   key={geo.rsmKey || iso_a3 || countryName}
                   geography={geo}
-                  fill={isVisited ? "#10b981" : "#e2e8f0"}
+                  fill={fillColor}
                   stroke="#FFFFFF"
                   strokeWidth={0.5}
                   style={{
                     default: {
-                      fill: isVisited ? "#10b981" : "#e2e8f0",
+                      fill: fillColor,
                       outline: "none",
                     },
                     hover: {
-                      fill: isVisited ? "#059669" : "#bfdbfe",
+                      fill: hoverFillColor,
                       outline: "none",
                       cursor: "pointer"
                     },
                     pressed: {
-                      fill: isVisited ? "#059669" : "#bfdbfe",
+                      fill: hoverFillColor,
                       outline: "none",
                     },
                   }}

@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
+import { CountrySearch } from "@/components/country-search";
+import { Label } from "@/components/ui/label";
 
 const loginSchema = insertUserSchema;
 const registerSchema = insertUserSchema;
@@ -41,6 +43,12 @@ export default function AuthPage() {
     loginMutation.mutate(values);
   };
 
+  // Import the CountrySearch component
+  const [selectedHomeCountry, setSelectedHomeCountry] = useState<{
+    code: string;
+    name: string;
+  } | null>(null);
+  
   // Register form with extended schema to include full name and home country
   const extendedRegisterSchema = registerSchema.extend({
     fullName: z.string().min(2, "Name must be at least 2 characters").optional(),
@@ -58,6 +66,14 @@ export default function AuthPage() {
       homeCountryName: "",
     },
   });
+
+  // Update form fields when a country is selected
+  useEffect(() => {
+    if (selectedHomeCountry) {
+      registerForm.setValue("homeCountryCode", selectedHomeCountry.code);
+      registerForm.setValue("homeCountryName", selectedHomeCountry.name);
+    }
+  }, [selectedHomeCountry, registerForm]);
 
   const onRegisterSubmit = (values: z.infer<typeof extendedRegisterSchema>) => {
     // Convert to the format expected by the mutation
@@ -208,6 +224,41 @@ export default function AuthPage() {
                         </FormItem>
                       )}
                     />
+                    
+                    <FormField
+                      control={registerForm.control}
+                      name="fullName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Your Name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="homeCountry">Home Country</Label>
+                      <CountrySearch 
+                        onCountrySelect={(country) => setSelectedHomeCountry(country)}
+                        selectedCountryCode={registerForm.getValues().homeCountryCode}
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Select your home country to mark it on the map
+                      </p>
+                      
+                      {/* Hidden fields to store country code and name */}
+                      <input 
+                        type="hidden" 
+                        {...registerForm.register("homeCountryCode")} 
+                      />
+                      <input 
+                        type="hidden" 
+                        {...registerForm.register("homeCountryName")} 
+                      />
+                    </div>
                     
                     <div className="flex items-center space-x-2">
                       <Checkbox id="terms" required />
