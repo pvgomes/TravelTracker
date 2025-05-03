@@ -17,6 +17,8 @@ export default function CountriesListPage() {
   
   const filteredVisits = visits.filter(visit => 
     visit.countryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    visit.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    visit.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     visit.notes?.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
@@ -62,11 +64,15 @@ export default function CountriesListPage() {
                     </div>
                     <div className="ml-4 flex-1">
                       <h4 className="font-medium">{visit.countryName}</h4>
+                      <p className="text-sm">
+                        <MapPinIcon className="inline-block h-3 w-3 mr-1 opacity-70" />
+                        {visit.city}{visit.state ? `, ${visit.state}` : ''}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         Visited {format(new Date(visit.visitDate), "MMMM d, yyyy")}
                       </p>
                       {visit.notes && (
-                        <p className="text-sm mt-1">{visit.notes}</p>
+                        <p className="text-sm mt-1 text-muted-foreground italic">{visit.notes}</p>
                       )}
                     </div>
                     <Button size="sm" variant="outline">
