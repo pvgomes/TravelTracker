@@ -91,26 +91,36 @@ function getCountryVisitStatus(countryCode: string, visits: Visit[]) {
 }
 
 export function StatsOverview({ visits }: StatsOverviewProps) {
-  // Get unique country codes
-  const countryCodesSet = new Set(visits.map(visit => visit.countryCode));
+  // Get unique country codes from visits
+  const countryCodesSet = new Set<string>();
+  visits.forEach(visit => countryCodesSet.add(visit.countryCode));
   const uniqueCountryCodes = Array.from(countryCodesSet);
   
   // Categorize countries by visit status
-  const visitStats = uniqueCountryCodes.reduce((acc: Record<string, number>, code) => {
+  const visitStats = {
+    full: 0,
+    partial: 0,
+    none: 0
+  };
+  
+  uniqueCountryCodes.forEach(code => {
     const status = getCountryVisitStatus(code, visits);
-    acc[status] = (acc[status] || 0) + 1;
-    return acc;
-  }, { full: 0, partial: 0, none: 0 });
+    visitStats[status] += 1;
+  });
   
   // Total countries visited (fully or partially)
   const countriesVisited = visitStats.full + visitStats.partial;
   
   // Continents explored
-  const visitedContinents = new Set(
-    visits
-      .map(visit => countryToContinentMap[visit.countryCode] || "Unknown")
-      .filter(continent => continent !== "Unknown")
-  );
+  const continentsSet = new Set<string>();
+  visits.forEach(visit => {
+    const continent = countryToContinentMap[visit.countryCode];
+    if (continent && continent !== "Unknown") {
+      continentsSet.add(continent);
+    }
+  });
+  
+  const continentsVisited = continentsSet.size;
   
   // Log any unknown countries for debugging
   const unknownCountries = visits
@@ -120,8 +130,6 @@ export function StatsOverview({ visits }: StatsOverviewProps) {
   if (unknownCountries.length > 0) {
     console.log("Countries not mapped to continents:", unknownCountries);
   }
-  
-  const continentsVisited = visitedContinents.size;
   
   // World exploration percentage (very approximate)
   const totalCountries = 195; // Approximate number of countries in the world
