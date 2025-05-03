@@ -7,14 +7,56 @@ import { Loader2 } from "lucide-react";
 
 // Map continents to countries for statistics
 const countryToContinentMap: Record<string, string> = {
-  // This is a simplified mapping - in a real app, you would have a complete mapping
+  // North America
   "US": "North America", "CA": "North America", "MX": "North America",
+  "BZ": "North America", "CR": "North America", "CU": "North America",
+  "DO": "North America", "SV": "North America", "GT": "North America",
+  "HT": "North America", "HN": "North America", "JM": "North America",
+  "NI": "North America", "PA": "North America", "PR": "North America",
+  
+  // South America
   "BR": "South America", "AR": "South America", "CO": "South America",
+  "CL": "South America", "EC": "South America", "GY": "South America",
+  "PY": "South America", "PE": "South America", "SR": "South America",
+  "UY": "South America", "VE": "South America", "BO": "South America",
+  
+  // Europe
   "GB": "Europe", "FR": "Europe", "DE": "Europe", "IT": "Europe", "ES": "Europe",
   "RU": "Europe", "UA": "Europe", "PL": "Europe", "SE": "Europe", "NO": "Europe",
+  "AL": "Europe", "AT": "Europe", "BY": "Europe", "BE": "Europe", "BA": "Europe",
+  "BG": "Europe", "HR": "Europe", "CZ": "Europe", "DK": "Europe", "EE": "Europe",
+  "FI": "Europe", "GR": "Europe", "HU": "Europe", "IS": "Europe", "IE": "Europe",
+  "LV": "Europe", "LT": "Europe", "LU": "Europe", "MK": "Europe", "MT": "Europe",
+  "MD": "Europe", "ME": "Europe", "NL": "Europe", "PT": "Europe", "RO": "Europe",
+  "RS": "Europe", "SK": "Europe", "SI": "Europe", "CH": "Europe", "TR": "Europe",
+  
+  // Asia
   "CN": "Asia", "IN": "Asia", "JP": "Asia", "KR": "Asia", "TH": "Asia",
-  "AU": "Oceania", "NZ": "Oceania", "FJ": "Oceania",
+  "MY": "Asia", "ID": "Asia", "PH": "Asia", "VN": "Asia", "SG": "Asia",
+  "AF": "Asia", "AM": "Asia", "AZ": "Asia", "BH": "Asia", "BD": "Asia",
+  "BT": "Asia", "KH": "Asia", "GE": "Asia", "IR": "Asia", "IQ": "Asia",
+  "IL": "Asia", "JO": "Asia", "KZ": "Asia", "KW": "Asia", "KG": "Asia",
+  "LA": "Asia", "LB": "Asia", "MV": "Asia", "MN": "Asia", "MM": "Asia",
+  "NP": "Asia", "KP": "Asia", "OM": "Asia", "PK": "Asia", "PS": "Asia",
+  "QA": "Asia", "SA": "Asia", "LK": "Asia", "SY": "Asia", "TW": "Asia",
+  "TJ": "Asia", "TM": "Asia", "AE": "Asia", "UZ": "Asia", "YE": "Asia",
+  
+  // Oceania
+  "AU": "Oceania", "NZ": "Oceania", "FJ": "Oceania", 
+  "PG": "Oceania", "SB": "Oceania", "VU": "Oceania",
+  
+  // Africa
   "EG": "Africa", "ZA": "Africa", "MA": "Africa", "NG": "Africa", "KE": "Africa",
+  "DZ": "Africa", "AO": "Africa", "BJ": "Africa", "BW": "Africa", "BF": "Africa",
+  "BI": "Africa", "CV": "Africa", "CM": "Africa", "CF": "Africa", "TD": "Africa",
+  "KM": "Africa", "CD": "Africa", "CG": "Africa", "CI": "Africa", "DJ": "Africa",
+  "GQ": "Africa", "ER": "Africa", "SZ": "Africa", "ET": "Africa", "GA": "Africa",
+  "GM": "Africa", "GH": "Africa", "GN": "Africa", "GW": "Africa", "LS": "Africa",
+  "LR": "Africa", "LY": "Africa", "MG": "Africa", "MW": "Africa", "ML": "Africa",
+  "MR": "Africa", "MU": "Africa", "MZ": "Africa", "NA": "Africa", "NE": "Africa",
+  "RW": "Africa", "ST": "Africa", "SN": "Africa", "SC": "Africa", "SL": "Africa",
+  "SO": "Africa", "SS": "Africa", "SD": "Africa", "TZ": "Africa", "TG": "Africa",
+  "TN": "Africa", "UG": "Africa", "ZM": "Africa", "ZW": "Africa",
 };
 
 // Colors for the charts
@@ -37,15 +79,41 @@ export default function StatisticsPage() {
   
   // Calculate continent statistics
   const continentCounts: Record<string, number> = {};
+  const countriesByContinent: Record<string, string[]> = {};
+  
   visits.forEach(visit => {
     const continent = countryToContinentMap[visit.countryCode] || "Unknown";
+    
+    // Count countries per continent
     continentCounts[continent] = (continentCounts[continent] || 0) + 1;
+    
+    // Store which countries belong to each continent
+    if (!countriesByContinent[continent]) {
+      countriesByContinent[continent] = [];
+    }
+    
+    // Only add the country if it's not already in the list
+    if (!countriesByContinent[continent].includes(visit.countryName)) {
+      countriesByContinent[continent].push(visit.countryName);
+    }
   });
   
-  const continentData = Object.keys(continentCounts).map(continent => ({
-    name: continent,
-    value: continentCounts[continent]
-  }));
+  // Log any unknown country codes for debugging
+  const unknownCountries = visits
+    .filter(visit => !countryToContinentMap[visit.countryCode])
+    .map(visit => `${visit.countryName} (${visit.countryCode})`);
+  
+  if (unknownCountries.length > 0) {
+    console.log("Countries not mapped to continents:", unknownCountries);
+  }
+  
+  const continentData = Object.keys(continentCounts)
+    .sort((a, b) => continentCounts[b] - continentCounts[a]) // Sort by count descending
+    .map(continent => ({
+      name: continent,
+      value: continentCounts[continent],
+      countries: countriesByContinent[continent].join(", ")
+    }));
   
   // Calculate visits by year
   const visitsByYear: Record<string, number> = {};
@@ -123,7 +191,16 @@ export default function StatisticsPage() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip formatter={(value, name, props) => {
+                      const entry = continentData.find(d => d.name === name);
+                      return [
+                        <>
+                          <div><strong>{value} countries</strong></div>
+                          <div className="text-xs mt-1">{entry?.countries || "None"}</div>
+                        </>,
+                        name
+                      ];
+                    }} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
@@ -162,6 +239,32 @@ export default function StatisticsPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
+      
+      {/* Continent Breakdown */}
+      <div className="mt-8">
+        <h3 className="text-xl font-bold mb-4">Continent Breakdown</h3>
+        <div className="grid grid-cols-1 gap-4">
+          {continentData.map((continent, index) => (
+            <Card key={continent.name}>
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2 mb-2">
+                  <div 
+                    className="w-4 h-4 rounded-full" 
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  />
+                  <h4 className="text-lg font-semibold">{continent.name}</h4>
+                  <span className="text-sm text-muted-foreground">
+                    ({continent.value} countries - {((continent.value / visits.length) * 100).toFixed(1)}%)
+                  </span>
+                </div>
+                <p className="text-sm pt-2">
+                  <span className="font-medium">Countries:</span> {continent.countries || "None"}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </Layout>
   );

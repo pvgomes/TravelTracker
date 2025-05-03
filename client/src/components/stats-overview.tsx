@@ -5,14 +5,56 @@ import { format } from "date-fns";
 
 // Map continents to countries for statistics
 const countryToContinentMap: Record<string, string> = {
-  // This is a simplified mapping - in a real app, you would have a complete mapping
+  // North America
   "US": "North America", "CA": "North America", "MX": "North America",
+  "BZ": "North America", "CR": "North America", "CU": "North America",
+  "DO": "North America", "SV": "North America", "GT": "North America",
+  "HT": "North America", "HN": "North America", "JM": "North America",
+  "NI": "North America", "PA": "North America", "PR": "North America",
+  
+  // South America
   "BR": "South America", "AR": "South America", "CO": "South America",
+  "CL": "South America", "EC": "South America", "GY": "South America",
+  "PY": "South America", "PE": "South America", "SR": "South America",
+  "UY": "South America", "VE": "South America", "BO": "South America",
+  
+  // Europe
   "GB": "Europe", "FR": "Europe", "DE": "Europe", "IT": "Europe", "ES": "Europe",
   "RU": "Europe", "UA": "Europe", "PL": "Europe", "SE": "Europe", "NO": "Europe",
+  "AL": "Europe", "AT": "Europe", "BY": "Europe", "BE": "Europe", "BA": "Europe",
+  "BG": "Europe", "HR": "Europe", "CZ": "Europe", "DK": "Europe", "EE": "Europe",
+  "FI": "Europe", "GR": "Europe", "HU": "Europe", "IS": "Europe", "IE": "Europe",
+  "LV": "Europe", "LT": "Europe", "LU": "Europe", "MK": "Europe", "MT": "Europe",
+  "MD": "Europe", "ME": "Europe", "NL": "Europe", "PT": "Europe", "RO": "Europe",
+  "RS": "Europe", "SK": "Europe", "SI": "Europe", "CH": "Europe", "TR": "Europe",
+  
+  // Asia
   "CN": "Asia", "IN": "Asia", "JP": "Asia", "KR": "Asia", "TH": "Asia",
-  "AU": "Oceania", "NZ": "Oceania", "FJ": "Oceania",
+  "MY": "Asia", "ID": "Asia", "PH": "Asia", "VN": "Asia", "SG": "Asia",
+  "AF": "Asia", "AM": "Asia", "AZ": "Asia", "BH": "Asia", "BD": "Asia",
+  "BT": "Asia", "KH": "Asia", "GE": "Asia", "IR": "Asia", "IQ": "Asia",
+  "IL": "Asia", "JO": "Asia", "KZ": "Asia", "KW": "Asia", "KG": "Asia",
+  "LA": "Asia", "LB": "Asia", "MV": "Asia", "MN": "Asia", "MM": "Asia",
+  "NP": "Asia", "KP": "Asia", "OM": "Asia", "PK": "Asia", "PS": "Asia",
+  "QA": "Asia", "SA": "Asia", "LK": "Asia", "SY": "Asia", "TW": "Asia",
+  "TJ": "Asia", "TM": "Asia", "AE": "Asia", "UZ": "Asia", "YE": "Asia",
+  
+  // Oceania
+  "AU": "Oceania", "NZ": "Oceania", "FJ": "Oceania", 
+  "PG": "Oceania", "SB": "Oceania", "VU": "Oceania",
+  
+  // Africa
   "EG": "Africa", "ZA": "Africa", "MA": "Africa", "NG": "Africa", "KE": "Africa",
+  "DZ": "Africa", "AO": "Africa", "BJ": "Africa", "BW": "Africa", "BF": "Africa",
+  "BI": "Africa", "CV": "Africa", "CM": "Africa", "CF": "Africa", "TD": "Africa",
+  "KM": "Africa", "CD": "Africa", "CG": "Africa", "CI": "Africa", "DJ": "Africa",
+  "GQ": "Africa", "ER": "Africa", "SZ": "Africa", "ET": "Africa", "GA": "Africa",
+  "GM": "Africa", "GH": "Africa", "GN": "Africa", "GW": "Africa", "LS": "Africa",
+  "LR": "Africa", "LY": "Africa", "MG": "Africa", "MW": "Africa", "ML": "Africa",
+  "MR": "Africa", "MU": "Africa", "MZ": "Africa", "NA": "Africa", "NE": "Africa",
+  "RW": "Africa", "ST": "Africa", "SN": "Africa", "SC": "Africa", "SL": "Africa",
+  "SO": "Africa", "SS": "Africa", "SD": "Africa", "TZ": "Africa", "TG": "Africa",
+  "TN": "Africa", "UG": "Africa", "ZM": "Africa", "ZW": "Africa",
 };
 
 interface StatsOverviewProps {
@@ -24,11 +66,22 @@ export function StatsOverview({ visits }: StatsOverviewProps) {
   const countriesVisited = visits.length;
   
   // Continents explored
-  const continentsVisited = new Set(
+  const visitedContinents = new Set(
     visits
       .map(visit => countryToContinentMap[visit.countryCode] || "Unknown")
       .filter(continent => continent !== "Unknown")
-  ).size;
+  );
+  
+  // Log any unknown countries for debugging
+  const unknownCountries = visits
+    .filter(visit => !countryToContinentMap[visit.countryCode])
+    .map(visit => `${visit.countryName} (${visit.countryCode})`);
+  
+  if (unknownCountries.length > 0) {
+    console.log("Countries not mapped to continents:", unknownCountries);
+  }
+  
+  const continentsVisited = visitedContinents.size;
   
   // World exploration percentage (very approximate)
   const totalCountries = 195; // Approximate number of countries in the world
