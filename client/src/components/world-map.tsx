@@ -104,7 +104,7 @@ export function WorldMap({ visits }: WorldMapProps) {
               if (countryName === "Brazil" || countryName === "Poland") {
                 console.log(`Country: ${countryName}, Mapped Code: ${mappedCode}, Is Visited: ${isVisited}`);
                 console.log(`Special Handling: ${specialHandling}`);
-                console.log(`Country codes in our set: ${[...visitedCountryCodes.codes].join(', ')}`);
+                console.log(`Country codes in our set: ${Array.from(visitedCountryCodes.codes).join(', ')}`);
               }
               
               return (

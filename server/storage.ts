@@ -1,12 +1,11 @@
 import { users, type User, type InsertUser, visits, type Visit } from "@shared/schema";
-import createMemoryStore from "memorystore";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
+import connectPg from "connect-pg-simple";
 import session from "express-session";
+import { pool } from "./db";
 
-// modify the interface with any CRUD methods
-// you might need
-
-const MemoryStore = createMemoryStore(session);
-
+// Define the interface for storage operations
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
@@ -20,75 +19,87 @@ export interface IStorage {
   updateVisit(id: number, visit: Partial<Omit<Visit, 'id' | 'userId'>>): Promise<Visit | undefined>;
   deleteVisit(id: number): Promise<boolean>;
   
-  // Session storage
-  sessionStore: session.SessionStore;
+  // Session store
+  sessionStore: session.Store;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private visits: Map<number, Visit>;
-  private userIdCounter: number;
-  private visitIdCounter: number;
-  public sessionStore: session.SessionStore;
+// PostgreSQL-based implementation of IStorage
+export class DatabaseStorage implements IStorage {
+  public sessionStore: session.Store;
 
   constructor() {
-    this.users = new Map();
-    this.visits = new Map();
-    this.userIdCounter = 1;
-    this.visitIdCounter = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000, // prune expired entries every 24h
+    const PostgresSessionStore = connectPg(session);
+    this.sessionStore = new PostgresSessionStore({ 
+      pool,
+      createTableIfMissing: true
     });
   }
 
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userIdCounter++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   // Visit methods
   async getVisitById(id: number): Promise<Visit | undefined> {
-    return this.visits.get(id);
+    const [visit] = await db.select().from(visits).where(eq(visits.id, id));
+    return visit;
   }
 
   async getVisitsByUserId(userId: number): Promise<Visit[]> {
-    return Array.from(this.visits.values()).filter(
-      (visit) => visit.userId === userId,
-    );
+    const userVisits = await db.select().from(visits).where(eq(visits.userId, userId));
+    return userVisits;
   }
 
   async createVisit(visit: Omit<Visit, 'id'>): Promise<Visit> {
-    const id = this.visitIdCounter++;
-    const newVisit: Visit = { ...visit, id };
-    this.visits.set(id, newVisit);
+    const [newVisit] = await db
+      .insert(visits)
+      .values({
+        ...visit,
+        notes: visit.notes ?? null // Ensure notes is never undefined
+      })
+      .returning();
     return newVisit;
   }
 
   async updateVisit(id: number, visitUpdate: Partial<Omit<Visit, 'id' | 'userId'>>): Promise<Visit | undefined> {
-    const visit = this.visits.get(id);
+    const [visit] = await db.select().from(visits).where(eq(visits.id, id));
     if (!visit) return undefined;
 
-    const updatedVisit: Visit = { ...visit, ...visitUpdate };
-    this.visits.set(id, updatedVisit);
+    const [updatedVisit] = await db
+      .update(visits)
+      .set({
+        ...visitUpdate,
+        notes: visitUpdate.notes ?? visit.notes // Preserve existing notes if not provided
+      })
+      .where(eq(visits.id, id))
+      .returning();
+    
     return updatedVisit;
   }
 
   async deleteVisit(id: number): Promise<boolean> {
-    return this.visits.delete(id);
+    const [deletedVisit] = await db
+      .delete(visits)
+      .where(eq(visits.id, id))
+      .returning();
+    return !!deletedVisit;
   }
 }
 
-export const storage = new MemStorage();
+// Export an instance of the database storage
+export const storage = new DatabaseStorage();
