@@ -21,7 +21,10 @@ export default function HomePage() {
   return (
     <Layout>
       <div className="flex justify-between items-center pb-5 border-b">
-        <h2 className="text-2xl font-bold font-montserrat leading-6">My Travel Map</h2>
+        <div>
+          <h2 className="text-2xl font-bold font-montserrat leading-6">Adam's Travel Map</h2>
+          <p className="text-sm text-muted-foreground mt-2">Track your global adventures</p>
+        </div>
         <Button onClick={() => setAddCountryOpen(true)}>
           <PlusIcon className="mr-2 h-4 w-4" />
           Add Country

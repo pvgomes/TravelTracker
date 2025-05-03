@@ -25,7 +25,7 @@ export function Header() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="font-montserrat font-bold text-2xl text-primary">TravelTracker</h1>
+              <h1 className="font-montserrat font-bold text-2xl text-primary">Adam's TravelTracker</h1>
             </div>
           </div>
           
@@ -41,7 +41,7 @@ export function Header() {
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-primary text-primary-foreground">
-                        {user?.username.charAt(0).toUpperCase()}
+                        A
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -49,7 +49,8 @@ export function Header() {
                 <DropdownMenuContent align="end">
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user?.username}</p>
+                      <p className="font-medium">Adam</p>
+                      <p className="text-xs text-muted-foreground">{user?.username}</p>
                     </div>
                   </div>
                   <DropdownMenuSeparator />
