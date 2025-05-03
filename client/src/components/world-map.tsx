@@ -245,25 +245,24 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
       const countryName = visit.countryName;
       names.add(countryName);
       
-      // Add 3-letter code if we can find it
-      for (const [name, codes] of Object.entries(countryMapping)) {
+      // Find the 3-letter code from our mapping
+      Object.entries(countryMapping).forEach(([name, codes]) => {
         if (name === countryName || codes[0] === code) {
           if (codes[1]) codes3.add(codes[1]); // Add 3-letter code
         }
-      }
+      });
     });
     
     return { codes2, codes3, names };
   }, [visits]);
   
-  // Debug log of all visited countries
+  // Debug log of visited countries only once during initialization
   useEffect(() => {
-    if (visits.length > 0) {
-      console.log("All visited countries:", visits.map(v => `${v.countryName} (${v.countryCode})`).join(", "));
-      console.log("2-letter codes:", Array.from(visitedCountryData.codes2));
-      console.log("3-letter codes:", Array.from(visitedCountryData.codes3));
-    }
-  }, [visits, visitedCountryData]);
+    // Disabled for now to prevent console flooding
+    // if (visits.length > 0) {
+    //   console.log("Visited countries count:", visits.length);
+    // }
+  }, []);
   
   return (
     <div ref={mapContainerRef} className="overflow-hidden h-[400px] w-full">
@@ -341,10 +340,10 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
                 hoverFillColor = "#a6f3d6";
               }
               
-              // Debug specific countries
-              if (["Malaysia", "Brazil", "Poland", "United States"].includes(countryName)) {
-                console.log(`Map country: ${countryName}, ISO-A2: ${iso_a2}, Status: ${visitStatus}`);
-              }
+              // Debug specific countries - disabled to prevent call stack issues
+              // if (["Malaysia", "Brazil", "Poland", "United States"].includes(countryName)) {
+              //  console.log(`Map country: ${countryName}, ISO-A2: ${iso_a2}, Status: ${visitStatus}`);
+              // }
               
               return (
                 <Geography

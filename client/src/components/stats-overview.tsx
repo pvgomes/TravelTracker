@@ -122,14 +122,14 @@ export function StatsOverview({ visits }: StatsOverviewProps) {
   
   const continentsVisited = continentsSet.size;
   
-  // Log any unknown countries for debugging
-  const unknownCountries = visits
-    .filter(visit => !countryToContinentMap[visit.countryCode])
-    .map(visit => `${visit.countryName} (${visit.countryCode})`);
+  // Disable logging to prevent potential call stack issues
+  // const unknownCountries = visits
+  //   .filter(visit => !countryToContinentMap[visit.countryCode])
+  //   .map(visit => `${visit.countryName} (${visit.countryCode})`);
   
-  if (unknownCountries.length > 0) {
-    console.log("Countries not mapped to continents:", unknownCountries);
-  }
+  // if (unknownCountries.length > 0) {
+  //   console.log("Countries not mapped to continents:", unknownCountries);
+  // }
   
   // World exploration percentage (very approximate)
   const totalCountries = 195; // Approximate number of countries in the world
