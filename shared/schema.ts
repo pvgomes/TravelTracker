@@ -6,6 +6,9 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  fullName: text("full_name"),
+  homeCountryCode: text("home_country_code"),
+  homeCountryName: text("home_country_name"),
 });
 
 export const visits = pgTable("visits", {
@@ -20,6 +23,9 @@ export const visits = pgTable("visits", {
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+  fullName: true,
+  homeCountryCode: true,
+  homeCountryName: true,
 });
 
 export const insertVisitSchema = createInsertSchema(visits).pick({

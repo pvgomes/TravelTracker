@@ -41,16 +41,26 @@ export default function AuthPage() {
     loginMutation.mutate(values);
   };
 
-  // Register form
-  const registerForm = useForm<z.infer<typeof registerSchema>>({
-    resolver: zodResolver(registerSchema),
+  // Register form with extended schema to include full name and home country
+  const extendedRegisterSchema = registerSchema.extend({
+    fullName: z.string().min(2, "Name must be at least 2 characters").optional(),
+    homeCountryCode: z.string().optional(),
+    homeCountryName: z.string().optional(),
+  });
+  
+  const registerForm = useForm<z.infer<typeof extendedRegisterSchema>>({
+    resolver: zodResolver(extendedRegisterSchema),
     defaultValues: {
       username: "",
       password: "",
+      fullName: "",
+      homeCountryCode: "",
+      homeCountryName: "",
     },
   });
 
-  const onRegisterSubmit = (values: z.infer<typeof registerSchema>) => {
+  const onRegisterSubmit = (values: z.infer<typeof extendedRegisterSchema>) => {
+    // Convert to the format expected by the mutation
     registerMutation.mutate(values);
   };
 
