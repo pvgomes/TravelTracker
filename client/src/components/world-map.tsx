@@ -1,30 +1,36 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { Visit } from "@shared/schema";
 
-// Using a reliable TopoJSON file
-const WORLD_MAP_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+// Using a reliable TopoJSON map URL
+const WORLD_MAP_URL = "https://unpkg.com/world-atlas@2.0.2/countries-110m.json";
 
-// ISO country code mapping - for converting 3-letter codes to 2-letter codes
-const iso3To2: Record<string, string> = {
-  "USA": "US", "CAN": "CA", "MEX": "MX", "BRA": "BR", "ARG": "AR", "GBR": "GB", 
-  "FRA": "FR", "DEU": "DE", "ITA": "IT", "ESP": "ES", "PRT": "PT", "NLD": "NL", 
-  "BEL": "BE", "CHE": "CH", "AUT": "AT", "GRC": "GR", "RUS": "RU", "CHN": "CN", 
-  "JPN": "JP", "KOR": "KR", "IND": "IN", "AUS": "AU", "NZL": "NZ", "ZAF": "ZA", 
-  "EGY": "EG", "MAR": "MA", "NGA": "NG", "KEN": "KE", "SAU": "SA", "ARE": "AE", 
-  "TUR": "TR", "THA": "TH", "VNM": "VN", "SGP": "SG", "MYS": "MY", "IDN": "ID", 
-  "PHL": "PH", "FIN": "FI", "SWE": "SE", "NOR": "NO", "DNK": "DK", "ISL": "IS", 
-  "IRL": "IE", "POL": "PL", "CZE": "CZ", "HUN": "HU", "UKR": "UA", "ROU": "RO", 
-  "BGR": "BG", "GRL": "GL", "ISR": "IL", "LBN": "LB", "PAK": "PK", "AFG": "AF",
-  "IRN": "IR", "IRQ": "IQ", "SYR": "SY", "JOR": "JO", "KWT": "KW", "QAT": "QA",
-  "OMN": "OM", "YEM": "YE", "DZA": "DZ", "TUN": "TN", "LBY": "LY", "SDN": "SD",
-  "ETH": "ET", "SOM": "SO", "UGA": "UG", "TZA": "TZ", "MOZ": "MZ", "ZWE": "ZW",
-  "NAM": "NA", "BWA": "BW", "LSO": "LS", "SWZ": "SZ", "MWI": "MW", "ZMB": "ZM",
-  "AGO": "AO", "COD": "CD", "COG": "CG", "GAB": "GA", "CMR": "CM", "TCD": "TD",
-  "NER": "NE", "MLI": "ML", "BFA": "BF", "GHA": "GH", "CIV": "CI", "LBR": "LR",
-  "SLE": "SL", "GIN": "GN", "GNB": "GW", "SEN": "SN", "GMB": "GM", "MRT": "MR",
-  "ESH": "EH", "DJI": "DJ", "ERI": "ER", "BDI": "BI", "RWA": "RW", "CAF": "CF",
-  "SSD": "SS"
+// Map for directly matching countries by name
+const countryNameToCode: Record<string, string> = {
+  "Brazil": "BR",
+  "Poland": "PL",
+  "United States of America": "US",
+  "United States": "US",
+  "Russia": "RU",
+  "China": "CN",
+  "India": "IN",
+  "Australia": "AU",
+  "Canada": "CA",
+  "Mexico": "MX",
+  "Argentina": "AR",
+  "United Kingdom": "GB",
+  "France": "FR",
+  "Germany": "DE",
+  "Italy": "IT",
+  "Spain": "ES",
+  "Portugal": "PT",
+  "Netherlands": "NL",
+  "Belgium": "BE",
+  "Switzerland": "CH",
+  "Austria": "AT",
+  "Greece": "GR",
+  "Japan": "JP",
+  "Malaysia": "MY"
 };
 
 interface WorldMapProps {
@@ -44,8 +50,18 @@ export function WorldMap({ visits }: WorldMapProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   
-  // Create a Set of visited country codes for easy lookup
-  const visitedCountries = new Set(visits.map(visit => visit.countryCode));
+  // Create sets of visited country codes and names
+  const visitedCountryCodes = useMemo(() => {
+    const codes = new Set<string>();
+    const names = new Set<string>();
+    
+    visits.forEach(visit => {
+      codes.add(visit.countryCode);
+      names.add(visit.countryName);
+    });
+    
+    return { codes, names };
+  }, [visits]);
   
   return (
     <div ref={mapContainerRef} className="overflow-hidden h-[400px] w-full">
@@ -65,17 +81,35 @@ export function WorldMap({ visits }: WorldMapProps) {
         <Geographies geography={WORLD_MAP_URL}>
           {({ geographies }) =>
             geographies.map((geo) => {
-              // Get the 3-letter ISO code (ISO_A3) from the properties
-              const iso3Code = geo.properties.ISO_A3 || "";
+              // Get the name from the geography properties
+              const countryName = geo.properties.name || "";
               
-              // Convert to 2-letter code using our mapping
-              const countryCode = iso3To2[iso3Code] || "";
+              // Check if this country is visited using multiple methods:
+              // 1. First check by code from our name mapping
+              const mappedCode = countryNameToCode[countryName];
+              const isCodeVisited = mappedCode && visitedCountryCodes.codes.has(mappedCode);
               
-              const isVisited = visitedCountries.has(countryCode);
+              // 2. Check directly by name
+              const isNameVisited = visitedCountryCodes.names.has(countryName);
+              
+              // Special case for Brazil and Poland
+              const specialHandling = 
+                (countryName === "Brazil" && visitedCountryCodes.codes.has("BR")) ||
+                (countryName === "Poland" && visitedCountryCodes.codes.has("PL"));
+              
+              // Determine if country should be highlighted
+              const isVisited = isCodeVisited || isNameVisited || specialHandling;
+              
+              // For debugging specific countries
+              if (countryName === "Brazil" || countryName === "Poland") {
+                console.log(`Country: ${countryName}, Mapped Code: ${mappedCode}, Is Visited: ${isVisited}`);
+                console.log(`Special Handling: ${specialHandling}`);
+                console.log(`Country codes in our set: ${[...visitedCountryCodes.codes].join(', ')}`);
+              }
               
               return (
                 <Geography
-                  key={geo.rsmKey || geo.id || geo.properties.ISO_A3}
+                  key={geo.rsmKey || geo.id || countryName}
                   geography={geo}
                   fill={isVisited ? "#10b981" : "#e2e8f0"}
                   stroke="#FFFFFF"
