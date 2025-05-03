@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout/layout";
-import { WorldMap } from "@/components/world-map";
+// import { WorldMap } from "@/components/world-map"; // Temporarily removed to fix performance issues
 import { StatsOverview } from "@/components/stats-overview";
 import { RecentTravels } from "@/components/recent-travels";
 import { AddCountryDialog } from "@/components/add-country-dialog";
@@ -61,11 +61,12 @@ export default function HomePage() {
           </div>
         </div>
         
-        <WorldMap 
-          visits={visits} 
-          homeCountryCode={user?.homeCountryCode || undefined} 
-          homeCountryName={user?.homeCountryName || undefined}
-        />
+        <div className="h-[400px] w-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 rounded">
+          <div className="text-center">
+            <p className="text-lg font-medium text-slate-600 dark:text-slate-400">Map temporarily disabled for performance reasons</p>
+            <p className="text-sm text-slate-500 dark:text-slate-500 mt-2">You've visited {visits.length} locations</p>
+          </div>
+        </div>
       </div>
       
       <RecentTravels visits={visits} />
