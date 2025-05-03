@@ -46,6 +46,8 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
     resolver: zodResolver(formSchema),
     defaultValues: {
       notes: "",
+      city: "",
+      state: "",
     },
   });
   
@@ -113,6 +115,56 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
             
             <FormField
               control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>City</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Enter the city you visited" 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="state"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center gap-2">
+                    <FormLabel>State/Province (optional)</FormLabel>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link href="/why-no-state" className="text-muted-foreground">
+                            <HelpCircle className="h-4 w-4" />
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="w-[200px] text-sm">
+                            Not all cities have states or provinces. Click to learn more.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <FormControl>
+                    <Input 
+                      placeholder="Enter state or province (optional)" 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
               name="visitDate"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
@@ -163,7 +215,11 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
                     <Textarea
                       placeholder="Add any memories or highlights from your trip..."
                       className="resize-none"
-                      {...field}
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                      name={field.name}
                     />
                   </FormControl>
                   <FormMessage />

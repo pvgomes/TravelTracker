@@ -38,7 +38,10 @@ export function RecentTravels({ visits }: RecentTravelsProps) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{visit.countryName}</p>
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-sm truncate">
+                        {visit.city}{visit.state ? `, ${visit.state}` : ''}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
                         Visited {format(new Date(visit.visitDate), "MMMM d, yyyy")}
                       </p>
                     </div>
