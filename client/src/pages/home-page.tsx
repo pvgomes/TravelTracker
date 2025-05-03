@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Visit } from "@shared/schema";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function HomePage() {
   const [addCountryOpen, setAddCountryOpen] = useState(false);
+  const { user } = useAuth();
   
   const { data: visits = [] } = useQuery<Visit[]>({
     queryKey: ["/api/visits"],
@@ -34,12 +36,22 @@ export default function HomePage() {
           <div className="text-sm text-muted-foreground flex items-center">
             <span className="inline-block w-3 h-3 bg-secondary rounded-full mr-1"></span>
             <span className="mr-3">Visited</span>
+            {user?.homeCountryCode && (
+              <>
+                <span className="inline-block w-3 h-3 bg-orange-500 rounded-full mr-1"></span>
+                <span className="mr-3">Home Country</span>
+              </>
+            )}
             <span className="inline-block w-3 h-3 bg-neutral-200 dark:bg-muted rounded-full mr-1"></span>
             <span>Not visited yet</span>
           </div>
         </div>
         
-        <WorldMap visits={visits} />
+        <WorldMap 
+          visits={visits} 
+          homeCountryCode={user?.homeCountryCode || undefined} 
+          homeCountryName={user?.homeCountryName || undefined}
+        />
       </div>
       
       <RecentTravels visits={visits} />

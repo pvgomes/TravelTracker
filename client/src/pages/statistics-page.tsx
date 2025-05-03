@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Visit } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, XAxis, YAxis, Bar } from "recharts";
-import { Loader2 } from "lucide-react";
+import { Loader2, Home } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { Badge } from "@/components/ui/badge";
 
 // Map continents to countries for statistics
 const countryToContinentMap: Record<string, string> = {
@@ -63,6 +65,7 @@ const countryToContinentMap: Record<string, string> = {
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 export default function StatisticsPage() {
+  const { user } = useAuth();
   const { data: visits = [], isLoading } = useQuery<Visit[]>({
     queryKey: ["/api/visits"],
   });
@@ -137,6 +140,12 @@ export default function StatisticsPage() {
     <Layout>
       <div className="flex justify-between items-center pb-5 border-b">
         <h2 className="text-2xl font-bold font-montserrat leading-6">My Travel Statistics</h2>
+        {user?.homeCountryName && (
+          <Badge variant="outline" className="flex items-center gap-1 text-sm py-1">
+            <Home className="h-3.5 w-3.5 text-orange-500" />
+            <span>Home: {user.homeCountryName}</span>
+          </Badge>
+        )}
       </div>
       
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
