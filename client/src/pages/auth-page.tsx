@@ -243,7 +243,7 @@ export default function AuthPage() {
                       <Label htmlFor="homeCountry">Home Country</Label>
                       <CountrySearch 
                         onCountrySelect={(country) => setSelectedHomeCountry(country)}
-                        selectedCountryCode={registerForm.getValues().homeCountryCode}
+                        selectedCountryCode={selectedHomeCountry?.code}
                       />
                       <p className="text-xs text-muted-foreground mt-1">
                         Select your home country to mark it on the map
