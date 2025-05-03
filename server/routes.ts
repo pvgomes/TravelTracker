@@ -33,6 +33,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const visit = await storage.createVisit({
         ...visitData,
         userId,
+        city: visitData.city,
+        state: visitData.state ?? null, // Ensure state is never undefined
         notes: visitData.notes ?? null, // Ensure notes is never undefined
       });
       

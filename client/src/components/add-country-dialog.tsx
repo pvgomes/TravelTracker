@@ -7,15 +7,18 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, Loader2, MapPinIcon } from "lucide-react";
+import { CalendarIcon, HelpCircle, InfoIcon, Loader2, MapPinIcon } from "lucide-react";
 import { CountrySearch } from "./country-search";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { insertVisitSchema } from "@shared/schema";
+import { Link } from "wouter";
 
 const formSchema = insertVisitSchema.extend({
   visitDate: z.date({
@@ -25,6 +28,10 @@ const formSchema = insertVisitSchema.extend({
     required_error: "Please select a country",
   }),
   countryName: z.string(),
+  city: z.string({
+    required_error: "Please enter a city name",
+  }),
+  state: z.string().optional(),
 });
 
 interface AddCountryDialogProps {
