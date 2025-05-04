@@ -31,7 +31,7 @@ export default function HomePage() {
     <Layout>
       <div className="flex justify-between items-center pb-5 border-b">
         <div>
-          <h2 className="text-2xl font-bold font-montserrat leading-6">Adam's Travel Map</h2>
+          <h2 className="text-2xl font-bold font-montserrat leading-6">Travel Map</h2>
           <p className="text-sm text-muted-foreground mt-2">Track your global adventures</p>
         </div>
         <Button onClick={() => setAddCountryOpen(true)}>
