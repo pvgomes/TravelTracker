@@ -54,17 +54,24 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
     },
   });
   
-  // Fetch states when country changes
+  // Only fetch states when a country is explicitly selected
   const selectedCountry = form.watch("countryCode");
   
   useEffect(() => {
+    // Clear any existing states first to avoid showing states from a previous country
+    setStates([]);
+    
+    // Only load states if a country is selected
     if (selectedCountry) {
-      const countryStates = State.getStatesOfCountry(selectedCountry);
-      setStates(countryStates);
-      // Reset state field when country changes
-      form.setValue("state", "");
-    } else {
-      setStates([]);
+      try {
+        const countryStates = State.getStatesOfCountry(selectedCountry);
+        setStates(Array.isArray(countryStates) ? countryStates : []);
+        // Reset state field when country changes
+        form.setValue("state", "");
+      } catch (error) {
+        console.error("Error loading states:", error);
+        setStates([]);
+      }
     }
   }, [selectedCountry, form]);
   
@@ -170,25 +177,33 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
                     </TooltipProvider>
                   </div>
                   <FormControl>
-                    {states.length > 0 ? (
-                      <Select 
-                        value={field.value} 
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a state/province" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {states.map((state) => (
-                            <SelectItem key={state.isoCode} value={state.name}>
-                              {state.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    {selectedCountry ? (
+                      states.length > 0 ? (
+                        <Select 
+                          value={field.value} 
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a state/province" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {states.map((state) => (
+                              <SelectItem key={state.isoCode} value={state.name}>
+                                {state.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Input 
+                          placeholder="No states available for this country" 
+                          {...field} 
+                        />
+                      )
                     ) : (
                       <Input 
-                        placeholder="Enter state or province (optional)" 
+                        placeholder="First select a country" 
+                        disabled 
                         {...field} 
                       />
                     )}
