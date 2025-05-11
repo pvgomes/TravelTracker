@@ -6,67 +6,60 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-// Enhanced list of countries with codes
-import { Country } from "country-state-city";
-
-// Get all countries from the country-state-city library
-let allCountries = [];
-try {
-  allCountries = Country.getAllCountries().map(country => ({
-    code: country.isoCode,
-    name: country.name
-  }));
-} catch (error) {
-  console.error("Error loading countries:", error);
-  // Fallback to a basic list if the library fails
-  allCountries = [
-    { code: "US", name: "United States" },
-    { code: "CA", name: "Canada" },
-    { code: "MX", name: "Mexico" },
-    { code: "BR", name: "Brazil" },
-    { code: "AR", name: "Argentina" },
-    { code: "GB", name: "United Kingdom" },
-    { code: "FR", name: "France" },
-    { code: "DE", name: "Germany" },
-    { code: "IT", name: "Italy" },
-    { code: "ES", name: "Spain" },
-    { code: "PT", name: "Portugal" },
-    { code: "QA", name: "Qatar" }, // Specifically added Qatar
-    { code: "NL", name: "Netherlands" },
-    { code: "BE", name: "Belgium" },
-    { code: "CH", name: "Switzerland" },
-    { code: "AT", name: "Austria" },
-    { code: "GR", name: "Greece" },
-    { code: "RU", name: "Russia" },
-    { code: "CN", name: "China" },
-    { code: "JP", name: "Japan" },
-    { code: "KR", name: "South Korea" },
-    { code: "IN", name: "India" },
-    { code: "AU", name: "Australia" },
-    { code: "NZ", name: "New Zealand" },
-    { code: "ZA", name: "South Africa" },
-    { code: "EG", name: "Egypt" },
-    { code: "MA", name: "Morocco" },
-    { code: "NG", name: "Nigeria" },
-    { code: "KE", name: "Kenya" },
-    { code: "SA", name: "Saudi Arabia" },
-    { code: "AE", name: "United Arab Emirates" },
-    { code: "TR", name: "Turkey" },
-    { code: "TH", name: "Thailand" },
-    { code: "VN", name: "Vietnam" },
-    { code: "SG", name: "Singapore" },
-    { code: "MY", name: "Malaysia" },
-    { code: "ID", name: "Indonesia" },
-    { code: "PH", name: "Philippines" },
-  ];
-}
-
-// Ensure Qatar is included in the list
-if (!allCountries.some(country => country.code === "QA")) {
-  allCountries.push({ code: "QA", name: "Qatar" });
-}
-
-const COUNTRIES = allCountries;
+// List of countries with codes (this would typically come from a library like world-countries)
+// Simplified list for brevity
+const COUNTRIES = [
+  { code: "US", name: "United States" },
+  { code: "CA", name: "Canada" },
+  { code: "MX", name: "Mexico" },
+  { code: "BR", name: "Brazil" },
+  { code: "AR", name: "Argentina" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "FR", name: "France" },
+  { code: "DE", name: "Germany" },
+  { code: "IT", name: "Italy" },
+  { code: "ES", name: "Spain" },
+  { code: "PT", name: "Portugal" },
+  { code: "NL", name: "Netherlands" },
+  { code: "BE", name: "Belgium" },
+  { code: "CH", name: "Switzerland" },
+  { code: "AT", name: "Austria" },
+  { code: "GR", name: "Greece" },
+  { code: "RU", name: "Russia" },
+  { code: "CN", name: "China" },
+  { code: "JP", name: "Japan" },
+  { code: "KR", name: "South Korea" },
+  { code: "IN", name: "India" },
+  { code: "AU", name: "Australia" },
+  { code: "NZ", name: "New Zealand" },
+  { code: "ZA", name: "South Africa" },
+  { code: "EG", name: "Egypt" },
+  { code: "MA", name: "Morocco" },
+  { code: "NG", name: "Nigeria" },
+  { code: "KE", name: "Kenya" },
+  { code: "SA", name: "Saudi Arabia" },
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "TR", name: "Turkey" },
+  { code: "TH", name: "Thailand" },
+  { code: "VN", name: "Vietnam" },
+  { code: "SG", name: "Singapore" },
+  { code: "MY", name: "Malaysia" },
+  { code: "ID", name: "Indonesia" },
+  { code: "PH", name: "Philippines" },
+  { code: "FI", name: "Finland" },
+  { code: "SE", name: "Sweden" },
+  { code: "NO", name: "Norway" },
+  { code: "DK", name: "Denmark" },
+  { code: "IS", name: "Iceland" },
+  { code: "IE", name: "Ireland" },
+  { code: "PL", name: "Poland" },
+  { code: "CZ", name: "Czech Republic" },
+  { code: "AT", name: "Austria" },
+  { code: "HU", name: "Hungary" },
+  { code: "UA", name: "Ukraine" },
+  { code: "RO", name: "Romania" },
+  { code: "BG", name: "Bulgaria" },
+];
 
 interface CountrySearchProps {
   onCountrySelect: (country: { code: string; name: string }) => void;
@@ -87,12 +80,11 @@ export function CountrySearch({ onCountrySelect, selectedCountryCode }: CountryS
     }
   }, [open]);
   
-  // Improved filtering to prioritize name matches and partial matches
   const filteredCountries = searchValue === ""
     ? COUNTRIES
     : COUNTRIES.filter(country => 
         country.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-        country.code.toLowerCase() === searchValue.toLowerCase()
+        country.code.toLowerCase().includes(searchValue.toLowerCase())
       );
   
   return (
@@ -123,7 +115,7 @@ export function CountrySearch({ onCountrySelect, selectedCountryCode }: CountryS
                 {filteredCountries.map(country => (
                   <CommandItem
                     key={country.code}
-                    value={country.name}
+                    value={country.code}
                     onSelect={() => {
                       onCountrySelect(country);
                       setOpen(false);
