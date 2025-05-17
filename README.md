@@ -55,6 +55,12 @@ SESSION_SECRET=your_session_secret_here
 
 Replace `username`, `password`, and `travel_tracker` with your PostgreSQL credentials and desired database name.
 
+#### 3.2 Load on the env
+```
+export $(cat .env | xargs)
+echo $DATABASE_URL
+```
+
 ### 4. Set up the database schema
 
 Run the Drizzle migrations to set up your database schema:
