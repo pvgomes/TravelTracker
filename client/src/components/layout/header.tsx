@@ -12,12 +12,10 @@ export function Header() {
   
   return (
     <header className="bg-white dark:bg-card shadow-sm border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:pl-64">
         <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <h1 className="font-montserrat font-bold text-2xl text-primary">Adam's TravelTracker</h1>
-            </div>
+          <div className="flex items-center pl-2 sm:pl-0">
+            <h1 className="font-montserrat font-bold text-2xl text-primary">TravelTracker</h1>
           </div>
           
           <div className="flex items-center">
