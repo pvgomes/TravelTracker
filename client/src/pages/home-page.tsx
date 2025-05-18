@@ -23,11 +23,46 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function HomePage() {
   const [addCountryOpen, setAddCountryOpen] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const { toast } = useToast();
   const { user } = useAuth();
   
   const { data: visits = [] } = useQuery<Visit[]>({
     queryKey: ["/api/visits"],
   });
+
+  // Generate share link
+  const shareMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/share");
+      return await res.json();
+    },
+    onSuccess: (data: { shareId: string }) => {
+      const url = `${window.location.origin}/share/${data.shareId}`;
+      setShareUrl(url);
+      setShareDialogOpen(true);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Sharing failed",
+        description: "Could not generate share link. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleShare = () => {
+    shareMutation.mutate();
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shareUrl);
+    toast({
+      title: "Link copied!",
+      description: "Share link copied to clipboard",
+    });
+  };
 
   // Simple statistics
   const countriesVisited = visits.length;
@@ -46,10 +81,16 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold font-montserrat leading-6">Travel Map</h2>
           <p className="text-sm text-muted-foreground mt-2">Track your global adventures</p>
         </div>
-        <Button onClick={() => setAddCountryOpen(true)}>
-          <PlusIcon className="mr-2 h-4 w-4" />
-          Add Country
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleShare} disabled={shareMutation.isPending}>
+            <Share2Icon className="mr-2 h-4 w-4" />
+            Share Map
+          </Button>
+          <Button onClick={() => setAddCountryOpen(true)}>
+            <PlusIcon className="mr-2 h-4 w-4" />
+            Add Country
+          </Button>
+        </div>
       </div>
       
       {/* Simple stats cards */}
@@ -114,8 +155,8 @@ export default function HomePage() {
         
         <WorldMap 
           visits={visits} 
-          homeCountryCode={user?.homeCountryCode} 
-          homeCountryName={user?.homeCountryName} 
+          homeCountryCode={user?.homeCountryCode ? String(user.homeCountryCode) : undefined}
+          homeCountryName={user?.homeCountryName ? String(user.homeCountryName) : undefined}
         />
       </div>
       
@@ -156,6 +197,38 @@ export default function HomePage() {
         open={addCountryOpen} 
         onOpenChange={setAddCountryOpen} 
       />
+      
+      {/* Share Dialog */}
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Share your travel map</DialogTitle>
+            <DialogDescription>
+              Use this link to share your travel map with friends and family.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2 mt-4">
+            <Input
+              value={shareUrl}
+              readOnly
+              className="flex-1"
+            />
+            <Button size="sm" onClick={copyToClipboard}>
+              Copy
+            </Button>
+          </div>
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setShareDialogOpen(false)}>
+              Close
+            </Button>
+            <Button asChild>
+              <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+                View Shared Map
+              </a>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
