@@ -4,11 +4,22 @@ import { WorldMap } from "@/components/world-map";
 import { AddCountryDialog } from "@/components/add-country-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { GlobeIcon, PlusIcon, CalendarIcon } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { GlobeIcon, PlusIcon, CalendarIcon, Share2Icon } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Visit } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function HomePage() {
   const [addCountryOpen, setAddCountryOpen] = useState(false);

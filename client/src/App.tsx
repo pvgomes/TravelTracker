@@ -10,6 +10,7 @@ import AddCountryPage from "@/pages/add-country-page";
 import CountriesListPage from "@/pages/countries-list-page";
 import StatisticsPage from "@/pages/statistics-page";
 import WhyNoStatePage from "@/pages/why-no-state-page";
+import SharedMapPage from "@/pages/shared-map-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "./hooks/use-auth";
 import { ThemeProvider } from "next-themes";
@@ -19,6 +20,7 @@ function Router() {
     <Switch>
       <Route path="/auth" component={AuthPage} />
       <Route path="/why-no-state" component={WhyNoStatePage} />
+      <Route path="/share/:shareId" component={SharedMapPage} />
       <ProtectedRoute path="/" component={HomePage} />
       <ProtectedRoute path="/add" component={AddCountryPage} />
       <ProtectedRoute path="/countries" component={CountriesListPage} />
