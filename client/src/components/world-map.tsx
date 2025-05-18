@@ -189,7 +189,7 @@ interface WorldMapProps {
   homeCountryName?: string;
 }
 
-// Determine if a country has been fully or partially visited
+// Simplified function - only determines if a country has been visited
 function getCountryVisitStatus(countryCode: string, visits: Visit[]) {
   // Get all visits for this country
   const countryVisits = visits.filter(v => v.countryCode === countryCode);
@@ -198,23 +198,8 @@ function getCountryVisitStatus(countryCode: string, visits: Visit[]) {
     return 'none'; // No visits to this country
   }
   
-  // For now, mark every country with at least one visit as fully visited
-  // to avoid any possible performance issues with State API calls
-  const hasVisits = countryVisits.length > 0;
-  if (hasVisits) {
-    // Check if any visit has a state specified
-    const hasStateInfo = countryVisits.some(visit => Boolean(visit.state));
-    if (!hasStateInfo) {
-      return 'full'; // No state info, consider it fully visited
-    }
-    
-    // Randomly assign full or partial status based on a predefined set
-    // This is a temporary solution to demonstrate the UI without causing performance issues
-    const partialCountries = ['US', 'BR', 'IN', 'CN', 'RU', 'AU', 'CA'];
-    return partialCountries.includes(countryCode) ? 'partial' : 'full';
-  }
-  
-  return 'none';
+  // Any country with at least one visit is considered visited
+  return 'visited';
 }
 
 export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapProps) {

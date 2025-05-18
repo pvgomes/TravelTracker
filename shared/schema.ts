@@ -18,7 +18,6 @@ export const visits = pgTable("visits", {
   countryCode: text("country_code").notNull(),
   countryName: text("country_name").notNull(),
   city: text("city").notNull(),
-  state: text("state"),
   visitDate: date("visit_date", { mode: "string" }).notNull(),
   notes: text("notes"),
 });
@@ -35,7 +34,6 @@ export const insertVisitSchema = createInsertSchema(visits).pick({
   countryCode: true,
   countryName: true,
   city: true,
-  state: true,
   visitDate: true,
   notes: true,
 });
