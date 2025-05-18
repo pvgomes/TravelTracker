@@ -198,7 +198,7 @@ export default function SharedMapPage() {
                         {format(new Date(visit.visitDate), 'MMM d, yyyy')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        {visit.city}{visit.state ? `, ${visit.state}` : ''}
+                        {visit.city}
                       </td>
                     </tr>
                   ))}
