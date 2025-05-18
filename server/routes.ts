@@ -42,6 +42,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         city: visitData.city,
         notes: visitData.notes ?? null, // Ensure notes is never undefined
         visitDate: visitDate.toISOString().split('T')[0], // YYYY-MM-DD format
+        state: null, // Set state to null since we no longer use it
       });
       
       res.status(201).json(visit);

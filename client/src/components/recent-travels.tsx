@@ -47,7 +47,9 @@ export function RecentTravels({ visits }: RecentTravelsProps) {
                         {visit.city}{visit.state ? `, ${visit.state}` : ''}
                       </p>
                       <p className="text-xs text-muted-foreground truncate">
-                        Visited {format(new Date(visit.visitDate), "MMMM d, yyyy")}
+                        Visited {visit.visitMonth && visit.visitYear ? 
+                          `${new Date(0, visit.visitMonth - 1).toLocaleString('default', { month: 'long' })} ${visit.visitYear}` : 
+                          (visit.visitDate && visit.visitDate !== null ? format(new Date(visit.visitDate), "MMMM yyyy") : "Unknown date")}
                       </p>
                     </div>
                     <Button variant="outline" size="sm" className="rounded-full">
