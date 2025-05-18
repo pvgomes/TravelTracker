@@ -14,6 +14,7 @@ export interface IStorage {
   getUserByShareId(shareId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   generateShareId(userId: number): Promise<string>;
+  updateShareId(userId: number, shareId: string): Promise<boolean>;
   
   // Visit methods
   getVisitById(id: number): Promise<Visit | undefined>;
@@ -85,6 +86,28 @@ export class DatabaseStorage implements IStorage {
     }
     
     return user.shareId;
+  }
+  
+  async updateShareId(userId: number, shareId: string): Promise<boolean> {
+    // Check if user exists
+    const user = await this.getUser(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
+    try {
+      // Update the user with the new shareId
+      const [updatedUser] = await db
+        .update(users)
+        .set({ shareId })
+        .where(eq(users.id, userId))
+        .returning();
+      
+      return !!updatedUser;
+    } catch (error) {
+      console.error("Failed to update shareId:", error);
+      return false;
+    }
   }
 
   // Visit methods

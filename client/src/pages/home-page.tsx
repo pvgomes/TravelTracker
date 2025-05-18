@@ -39,7 +39,7 @@ export default function HomePage() {
       return await res.json();
     },
     onSuccess: (data: { shareId: string }) => {
-      const url = `${window.location.origin}/share/${data.shareId}`;
+      const url = `${window.location.origin}/social/${data.shareId}`;
       setShareUrl(url);
       setShareDialogOpen(true);
     },

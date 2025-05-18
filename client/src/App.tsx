@@ -20,7 +20,7 @@ function Router() {
     <Switch>
       <Route path="/auth" component={AuthPage} />
       <Route path="/why-no-state" component={WhyNoStatePage} />
-      <Route path="/share/:shareId" component={SharedMapPage} />
+      <Route path="/social/:shareId" component={SharedMapPage} />
       <ProtectedRoute path="/" component={HomePage} />
       <ProtectedRoute path="/add" component={AddCountryPage} />
       <ProtectedRoute path="/countries" component={CountriesListPage} />

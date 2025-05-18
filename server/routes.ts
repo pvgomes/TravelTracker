@@ -95,22 +95,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(204).send();
   });
 
-  // Create or get user's shareId
+  // Create or get user's shareId (friendly URL slug)
   app.post("/api/share", isAuthenticated, async (req, res) => {
     try {
-      const shareId = await storage.generateShareId(req.user!.id);
-      res.json({ shareId });
+      // Generate a friendly slug based on the user's username or full name
+      const user = req.user!;
+      
+      // Create the friendly URL slug
+      let friendlySlug;
+      if (user.fullName) {
+        // Generate from full name (convert "John Doe" to "john-doe")
+        friendlySlug = user.fullName.toLowerCase().replace(/\s+/g, '-');
+      } else {
+        // Generate from username (remove email domain if it's an email)
+        friendlySlug = user.username.split('@')[0].toLowerCase();
+      }
+      
+      // Add user's ID as a suffix to ensure uniqueness while keeping URL readable
+      const userIdSuffix = user.id.toString().padStart(4, '0');
+      const slugWithId = `${friendlySlug}-${userIdSuffix}`;
+      
+      // Save this as the user's shareId
+      await storage.updateShareId(user.id, slugWithId);
+      
+      res.json({ shareId: slugWithId });
     } catch (error) {
       console.error("Failed to generate share ID:", error);
       res.status(500).json({ message: "Failed to generate share ID" });
     }
   });
   
-  // Get public shared user data by shareId
+  // Get public shared user data by friendly slug
   app.get("/api/public/:shareId", async (req, res) => {
     try {
       const shareId = req.params.shareId;
-      if (!shareId || shareId.length !== 32) {
+      if (!shareId || shareId.length < 3) {
         return res.status(400).json({ message: "Invalid share ID" });
       }
       
