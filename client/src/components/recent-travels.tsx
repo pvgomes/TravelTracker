@@ -12,10 +12,15 @@ interface RecentTravelsProps {
 export function RecentTravels({ visits }: RecentTravelsProps) {
   const [_, navigate] = useLocation();
   
-  // Sort visits by date, most recent first
-  const sortedVisits = [...visits].sort((a, b) => 
-    new Date(b.visitDate).getTime() - new Date(a.visitDate).getTime()
-  );
+  // Sort visits by year and month, most recent first
+  const sortedVisits = [...visits].sort((a, b) => {
+    // Sort by year first
+    if (b.visitYear !== a.visitYear) {
+      return b.visitYear - a.visitYear;
+    }
+    // Then by month if years are the same
+    return b.visitMonth - a.visitMonth;
+  });
   
   // Get the most recent 3 visits
   const recentVisits = sortedVisits.slice(0, 3);

@@ -30,11 +30,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user!.id;
       const visitData = insertVisitSchema.parse(req.body);
       
+      // Generate a visitDate from the month/year for backward compatibility
+      const visitDate = new Date();
+      visitDate.setMonth(visitData.visitMonth - 1);
+      visitDate.setFullYear(visitData.visitYear);
+      visitDate.setDate(1); // First day of the month
+      
       const visit = await storage.createVisit({
         ...visitData,
         userId,
         city: visitData.city,
         notes: visitData.notes ?? null, // Ensure notes is never undefined
+        visitDate: visitDate.toISOString().split('T')[0], // YYYY-MM-DD format
       });
       
       res.status(201).json(visit);

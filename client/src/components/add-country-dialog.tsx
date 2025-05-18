@@ -14,7 +14,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { insertVisitSchema } from "@shared/schema";
 
-// Our form schema that includes countryCode, countryName, city, notes, and visitDate
+// Our form schema that includes countryCode, countryName, city, notes, visitMonth and visitYear
 const formSchema = insertVisitSchema.extend({});
 
 interface AddCountryDialogProps {
@@ -24,23 +24,16 @@ interface AddCountryDialogProps {
 
 export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) {
   const { toast } = useToast();
-  const [month, setMonth] = React.useState(new Date().getMonth() + 1);
-  const [year, setYear] = React.useState(2025);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       notes: "",
       city: "",
-      visitDate: `${year}-${String(month).padStart(2, '0')}-01`,
+      visitMonth: new Date().getMonth() + 1,
+      visitYear: 2025,
     },
   });
-  
-  // When month or year changes, update the visitDate in the form
-  React.useEffect(() => {
-    const formattedDate = `${year}-${String(month).padStart(2, '0')}-01`;
-    form.setValue('visitDate', formattedDate);
-  }, [month, year, form]);
   
   const addVisitMutation = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
@@ -117,56 +110,61 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
             />
             
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <FormLabel>Month</FormLabel>
-                <select
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  value={month}
-                  onChange={(e) => setMonth(parseInt(e.target.value, 10))}
-                >
-                  <option value="1">January</option>
-                  <option value="2">February</option>
-                  <option value="3">March</option>
-                  <option value="4">April</option>
-                  <option value="5">May</option>
-                  <option value="6">June</option>
-                  <option value="7">July</option>
-                  <option value="8">August</option>
-                  <option value="9">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
-                </select>
-              </div>
+              <FormField
+                control={form.control}
+                name="visitMonth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Month</FormLabel>
+                    <FormControl>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={field.value}
+                        onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                      >
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
-              <div>
-                <FormLabel>Year</FormLabel>
-                <select
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  value={year}
-                  onChange={(e) => setYear(parseInt(e.target.value, 10))}
-                >
-                  {Array.from({ length: 126 }, (_, i) => 2025 - i).map((yearOption) => (
-                    <option key={yearOption} value={yearOption}>
-                      {yearOption}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <FormField
+                control={form.control}
+                name="visitYear"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Year</FormLabel>
+                    <FormControl>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={field.value}
+                        onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                      >
+                        {Array.from({ length: 126 }, (_, i) => 2025 - i).map((yearOption) => (
+                          <option key={yearOption} value={yearOption}>
+                            {yearOption}
+                          </option>
+                        ))}
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            
-            {/* Hidden form field for the actual date that gets submitted */}
-            <FormField
-              control={form.control}
-              name="visitDate"
-              render={() => (
-                <FormItem className="hidden">
-                  <FormControl>
-                    <Input type="hidden" />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
             
             <FormField
               control={form.control}
