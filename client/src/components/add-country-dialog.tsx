@@ -17,10 +17,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { insertVisitSchema } from "@shared/schema";
 
-const formSchema = insertVisitSchema.extend({
-  visitDate: z.date({
-    required_error: "A visit date is required",
-  }),
+const formSchema = z.object({
   countryCode: z.string({
     required_error: "Please select a country",
   }),
@@ -28,6 +25,13 @@ const formSchema = insertVisitSchema.extend({
   city: z.string({
     required_error: "Please enter a city name",
   }),
+  visitMonth: z.number({
+    required_error: "Please select a month",
+  }).min(1).max(12),
+  visitYear: z.number({
+    required_error: "Please select a year",
+  }).min(1900).max(2100),
+  notes: z.string().optional(),
 });
 
 interface AddCountryDialogProps {
@@ -43,17 +47,14 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
     defaultValues: {
       notes: "",
       city: "",
+      visitMonth: new Date().getMonth() + 1, // Current month (1-12)
+      visitYear: 2025, // Current year
     },
   });
   
   const addVisitMutation = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
-      const visitData = {
-        ...values,
-        visitDate: format(values.visitDate, "yyyy-MM-dd"),
-      };
-      
-      const res = await apiRequest("POST", "/api/visits", visitData);
+      const res = await apiRequest("POST", "/api/visits", values);
       return res.json();
     },
     onSuccess: () => {
@@ -125,51 +126,62 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
               )}
             />
             
-            <FormField
-              control={form.control}
-              name="visitDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Visit Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value || new Date()}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        fromYear={2025}
-                        toYear={1900}
-                        defaultMonth={new Date(2025, 0)}
-                        captionLayout="dropdown-buttons"
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="visitMonth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Month</FormLabel>
+                    <FormControl>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={field.value}
+                        onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                      >
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="visitYear"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Year</FormLabel>
+                    <FormControl>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={field.value}
+                        onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                      >
+                        {Array.from({ length: 126 }, (_, i) => 2025 - i).map((year) => (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             
             <FormField
               control={form.control}
