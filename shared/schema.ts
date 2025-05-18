@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, date } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, date, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   fullName: text("full_name"),
   homeCountryCode: text("home_country_code"),
   homeCountryName: text("home_country_name"),
+  shareId: varchar("share_id", { length: 32 }).unique(),
 });
 
 export const visits = pgTable("visits", {

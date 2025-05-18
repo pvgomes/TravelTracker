@@ -4,13 +4,16 @@ import { eq, and } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
 import session from "express-session";
 import { pool } from "./db";
+import { randomBytes } from "crypto";
 
 // Define the interface for storage operations
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByShareId(shareId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  generateShareId(userId: number): Promise<string>;
   
   // Visit methods
   getVisitById(id: number): Promise<Visit | undefined>;
@@ -45,6 +48,11 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user;
   }
+  
+  async getUserByShareId(shareId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.shareId, shareId));
+    return user;
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db
@@ -52,6 +60,31 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+  
+  async generateShareId(userId: number): Promise<string> {
+    // Check if user exists
+    const user = await this.getUser(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
+    // Generate a random shareId if it doesn't exist
+    if (!user.shareId) {
+      // Create a URL-friendly shareId: 16 random bytes as hex = 32 characters
+      const shareId = randomBytes(16).toString('hex');
+      
+      // Update the user with the new shareId
+      const [updatedUser] = await db
+        .update(users)
+        .set({ shareId })
+        .where(eq(users.id, userId))
+        .returning();
+      
+      return updatedUser.shareId as string;
+    }
+    
+    return user.shareId;
   }
 
   // Visit methods

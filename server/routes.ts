@@ -95,6 +95,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(204).send();
   });
 
+  // Create or get user's shareId
+  app.post("/api/share", isAuthenticated, async (req, res) => {
+    try {
+      const shareId = await storage.generateShareId(req.user!.id);
+      res.json({ shareId });
+    } catch (error) {
+      console.error("Failed to generate share ID:", error);
+      res.status(500).json({ message: "Failed to generate share ID" });
+    }
+  });
+  
+  // Get public shared user data by shareId
+  app.get("/api/public/:shareId", async (req, res) => {
+    try {
+      const shareId = req.params.shareId;
+      if (!shareId || shareId.length !== 32) {
+        return res.status(400).json({ message: "Invalid share ID" });
+      }
+      
+      const user = await storage.getUserByShareId(shareId);
+      if (!user) {
+        return res.status(404).json({ message: "Shared profile not found" });
+      }
+      
+      // Get the visits for this user
+      const visits = await storage.getVisitsByUserId(user.id);
+      
+      // Return only public data, excluding sensitive information
+      const publicUserData = {
+        fullName: user.fullName || "Travel Enthusiast",
+        homeCountryCode: user.homeCountryCode,
+        homeCountryName: user.homeCountryName,
+        visits
+      };
+      
+      res.json(publicUserData);
+    } catch (error) {
+      console.error("Failed to fetch public profile:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
