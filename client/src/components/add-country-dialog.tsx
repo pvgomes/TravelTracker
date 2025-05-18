@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,15 +6,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { CalendarIcon, Loader2, MapPinIcon } from "lucide-react";
+import { Loader2, MapPinIcon } from "lucide-react";
 import { CountrySearch } from "./country-search";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { insertVisitSchema } from "@shared/schema";
 
 const formSchema = z.object({
   countryCode: z.string({
@@ -54,7 +49,19 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
   
   const addVisitMutation = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
-      const res = await apiRequest("POST", "/api/visits", values);
+      // Convert month/year to a full date string in YYYY-MM-DD format
+      const visitDate = `${values.visitYear}-${String(values.visitMonth).padStart(2, '0')}-01`;
+      
+      // Send data in the format the server expects
+      const visitData = {
+        countryCode: values.countryCode,
+        countryName: values.countryName,
+        city: values.city,
+        visitDate: visitDate,
+        notes: values.notes || "",
+      };
+      
+      const res = await apiRequest("POST", "/api/visits", visitData);
       return res.json();
     },
     onSuccess: () => {
