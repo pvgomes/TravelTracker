@@ -314,15 +314,9 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
               if (isHomeCountry) {
                 fillColor = "#f97316"; // Orange for home country
                 hoverFillColor = "#ea580c";
-              } else if (visitStatus === 'full') {
-                fillColor = "#10b981"; // Green for fully visited countries
+              } else if (visitStatus === 'visited') {
+                fillColor = "#10b981"; // Green for visited countries
                 hoverFillColor = "#059669";
-              } else if (visitStatus === 'partial') {
-                fillColor = "#ddfaea"; // Light green fill for partially visited
-                strokeColor = "#10b981"; // Green border
-                strokeWidth = 1;
-                strokeStyle = "2 2"; // Dotted line
-                hoverFillColor = "#a6f3d6";
               }
               
               // Debug specific countries - disabled to prevent call stack issues

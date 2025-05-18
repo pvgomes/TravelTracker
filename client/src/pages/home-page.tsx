@@ -131,14 +131,7 @@ export default function HomePage() {
           <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-y-1">
             <div className="flex items-center mr-2">
               <span className="inline-block w-3 h-3 bg-[#10b981] rounded-full mr-1"></span>
-              <span>Fully visited</span>
-            </div>
-            <div className="flex items-center mr-2">
-              <span className="inline-block w-4 h-3 mr-1 rounded-sm" style={{ 
-                backgroundColor: "#ddfaea", 
-                border: "1px dashed #10b981"
-              }}></span>
-              <span>Partially visited</span>
+              <span>Visited</span>
             </div>
             {user?.homeCountryCode && (
               <div className="flex items-center mr-2">
@@ -183,7 +176,7 @@ export default function HomePage() {
                       {format(new Date(visit.visitDate), 'MMM d, yyyy')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {visit.city}{visit.state ? `, ${visit.state}` : ''}
+                      {visit.city}
                     </td>
                   </tr>
                 ))}
