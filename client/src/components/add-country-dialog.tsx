@@ -158,6 +158,9 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
                         disabled={(date) =>
                           date > new Date() || date < new Date("1900-01-01")
                         }
+                        fromYear={new Date().getFullYear()}
+                        toYear={1900}
+                        captionLayout="dropdown-buttons"
                         initialFocus
                       />
                     </PopoverContent>
