@@ -153,13 +153,14 @@ export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) 
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={field.value}
+                        selected={field.value || new Date()}
                         onSelect={field.onChange}
                         disabled={(date) =>
                           date > new Date() || date < new Date("1900-01-01")
                         }
-                        fromYear={new Date().getFullYear()}
+                        fromYear={2025}
                         toYear={1900}
+                        defaultMonth={new Date(2025, 0)}
                         captionLayout="dropdown-buttons"
                         initialFocus
                       />
