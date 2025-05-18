@@ -12,21 +12,13 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-const formSchema = z.object({
-  countryCode: z.string({
-    required_error: "Please select a country",
+import { insertVisitSchema } from "@shared/schema";
+
+// Form with date string that we'll convert from month/year selections
+const formSchema = insertVisitSchema.extend({
+  visitDate: z.string({
+    required_error: "A visit date is required",
   }),
-  countryName: z.string(),
-  city: z.string({
-    required_error: "Please enter a city name",
-  }),
-  visitMonth: z.number({
-    required_error: "Please select a month",
-  }).min(1).max(12),
-  visitYear: z.number({
-    required_error: "Please select a year",
-  }).min(1900).max(2100),
-  notes: z.string().optional(),
 });
 
 interface AddCountryDialogProps {
@@ -37,31 +29,28 @@ interface AddCountryDialogProps {
 export function AddCountryDialog({ open, onOpenChange }: AddCountryDialogProps) {
   const { toast } = useToast();
   
+  // Create state variables to hold month and year selections outside the form
+  const [selectedMonth, setSelectedMonth] = React.useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = React.useState(2025);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       notes: "",
       city: "",
-      visitMonth: new Date().getMonth() + 1, // Current month (1-12)
-      visitYear: 2025, // Current year
+      visitDate: `2025-${String(new Date().getMonth() + 1).padStart(2, '0')}-01`,
     },
   });
   
+  // Update the visit date in the form whenever month or year changes
+  React.useEffect(() => {
+    const formattedDate = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`;
+    form.setValue("visitDate", formattedDate);
+  }, [selectedMonth, selectedYear, form]);
+  
   const addVisitMutation = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
-      // Convert month/year to a full date string in YYYY-MM-DD format
-      const visitDate = `${values.visitYear}-${String(values.visitMonth).padStart(2, '0')}-01`;
-      
-      // Send data in the format the server expects
-      const visitData = {
-        countryCode: values.countryCode,
-        countryName: values.countryName,
-        city: values.city,
-        visitDate: visitDate,
-        notes: values.notes || "",
-      };
-      
-      const res = await apiRequest("POST", "/api/visits", visitData);
+      const res = await apiRequest("POST", "/api/visits", values);
       return res.json();
     },
     onSuccess: () => {
