@@ -78,30 +78,17 @@ export function CountrySearch({ onCountrySelect, selectedCountryCode }: CountryS
     }
   }, [open]);
   
+  // Simple direct filtering - very reliable for text matching
   const filteredCountries = searchValue === ""
     ? COUNTRIES
     : COUNTRIES.filter(country => {
-        const searchLower = searchValue.toLowerCase();
-        const nameLower = country.name.toLowerCase();
-        const codeLower = country.code.toLowerCase();
+        // Convert both search value and country data to lowercase for case-insensitive comparison
+        const search = searchValue.toLowerCase();
+        const name = country.name.toLowerCase();
+        const code = country.code.toLowerCase();
         
-        // First priority: Check if name or code starts with the search string (best match)
-        if (nameLower.startsWith(searchLower) || codeLower.startsWith(searchLower)) {
-          return true;
-        }
-        
-        // Second priority: Check if search is a substring of the words in the country name
-        // This handles cases like typing "Ita" for "Italy" or "Unit" for "United States"
-        const words = nameLower.split(/\s+/);
-        for (const word of words) {
-          if (word.startsWith(searchLower)) {
-            return true;
-          }
-        }
-        
-        // Third priority: Check if the search is included anywhere in the name or code
-        // This catches any other matches that the above conditions might miss
-        return nameLower.includes(searchLower) || codeLower.includes(searchLower);
+        // Just check if the search text is contained anywhere in the name or code
+        return name.includes(search) || code.includes(search);
       });
   
   return (
