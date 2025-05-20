@@ -5,61 +5,13 @@ import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { Country } from "country-state-city";
 
-// List of countries with codes (this would typically come from a library like world-countries)
-// Simplified list for brevity
-const COUNTRIES = [
-  { code: "US", name: "United States" },
-  { code: "CA", name: "Canada" },
-  { code: "MX", name: "Mexico" },
-  { code: "BR", name: "Brazil" },
-  { code: "AR", name: "Argentina" },
-  { code: "GB", name: "United Kingdom" },
-  { code: "FR", name: "France" },
-  { code: "DE", name: "Germany" },
-  { code: "IT", name: "Italy" },
-  { code: "ES", name: "Spain" },
-  { code: "PT", name: "Portugal" },
-  { code: "NL", name: "Netherlands" },
-  { code: "BE", name: "Belgium" },
-  { code: "CH", name: "Switzerland" },
-  { code: "AT", name: "Austria" },
-  { code: "GR", name: "Greece" },
-  { code: "RU", name: "Russia" },
-  { code: "CN", name: "China" },
-  { code: "JP", name: "Japan" },
-  { code: "KR", name: "South Korea" },
-  { code: "IN", name: "India" },
-  { code: "AU", name: "Australia" },
-  { code: "NZ", name: "New Zealand" },
-  { code: "ZA", name: "South Africa" },
-  { code: "EG", name: "Egypt" },
-  { code: "MA", name: "Morocco" },
-  { code: "NG", name: "Nigeria" },
-  { code: "KE", name: "Kenya" },
-  { code: "SA", name: "Saudi Arabia" },
-  { code: "AE", name: "United Arab Emirates" },
-  { code: "TR", name: "Turkey" },
-  { code: "TH", name: "Thailand" },
-  { code: "VN", name: "Vietnam" },
-  { code: "SG", name: "Singapore" },
-  { code: "MY", name: "Malaysia" },
-  { code: "ID", name: "Indonesia" },
-  { code: "PH", name: "Philippines" },
-  { code: "FI", name: "Finland" },
-  { code: "SE", name: "Sweden" },
-  { code: "NO", name: "Norway" },
-  { code: "DK", name: "Denmark" },
-  { code: "IS", name: "Iceland" },
-  { code: "IE", name: "Ireland" },
-  { code: "PL", name: "Poland" },
-  { code: "CZ", name: "Czech Republic" },
-  { code: "AT", name: "Austria" },
-  { code: "HU", name: "Hungary" },
-  { code: "UA", name: "Ukraine" },
-  { code: "RO", name: "Romania" },
-  { code: "BG", name: "Bulgaria" },
-];
+// Use the comprehensive country list from the country-state-city library
+const COUNTRIES = Country.getAllCountries().map(country => ({
+  code: country.isoCode,
+  name: country.name
+}));
 
 interface CountrySearchProps {
   onCountrySelect: (country: { code: string; name: string }) => void;
@@ -82,10 +34,29 @@ export function CountrySearch({ onCountrySelect, selectedCountryCode }: CountryS
   
   const filteredCountries = searchValue === ""
     ? COUNTRIES
-    : COUNTRIES.filter(country => 
-        country.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-        country.code.toLowerCase().includes(searchValue.toLowerCase())
-      );
+    : COUNTRIES.filter(country => {
+        const searchLower = searchValue.toLowerCase();
+        const nameLower = country.name.toLowerCase();
+        const codeLower = country.code.toLowerCase();
+        
+        // First priority: Check if name or code starts with the search string (best match)
+        if (nameLower.startsWith(searchLower) || codeLower.startsWith(searchLower)) {
+          return true;
+        }
+        
+        // Second priority: Check if search is a substring of the words in the country name
+        // This handles cases like typing "Ita" for "Italy" or "Unit" for "United States"
+        const words = nameLower.split(/\s+/);
+        for (const word of words) {
+          if (word.startsWith(searchLower)) {
+            return true;
+          }
+        }
+        
+        // Third priority: Check if the search is included anywhere in the name or code
+        // This catches any other matches that the above conditions might miss
+        return nameLower.includes(searchLower) || codeLower.includes(searchLower);
+      });
   
   return (
     <Popover open={open} onOpenChange={setOpen}>
