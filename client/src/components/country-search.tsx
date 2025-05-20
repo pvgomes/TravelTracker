@@ -5,13 +5,59 @@ import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Country } from "country-state-city";
+// Using direct imports since we don't need the country-state-city library functionality
 
-// Use the comprehensive country list from the country-state-city library
-const COUNTRIES = Country.getAllCountries().map(country => ({
-  code: country.isoCode,
-  name: country.name
-}));
+// Create a simple array of country data for search
+const COUNTRIES = [
+  { code: "US", name: "United States" },
+  { code: "CA", name: "Canada" },
+  { code: "MX", name: "Mexico" },
+  { code: "BR", name: "Brazil" },
+  { code: "AR", name: "Argentina" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "FR", name: "France" },
+  { code: "DE", name: "Germany" },
+  { code: "IT", name: "Italy" },
+  { code: "ES", name: "Spain" },
+  { code: "PT", name: "Portugal" },
+  { code: "NL", name: "Netherlands" },
+  { code: "BE", name: "Belgium" },
+  { code: "CH", name: "Switzerland" },
+  { code: "AT", name: "Austria" },
+  { code: "GR", name: "Greece" },
+  { code: "RU", name: "Russia" },
+  { code: "CN", name: "China" },
+  { code: "JP", name: "Japan" },
+  { code: "KR", name: "South Korea" },
+  { code: "IN", name: "India" },
+  { code: "AU", name: "Australia" },
+  { code: "NZ", name: "New Zealand" },
+  { code: "ZA", name: "South Africa" },
+  { code: "NG", name: "Nigeria" },
+  { code: "SA", name: "Saudi Arabia" },
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "TR", name: "Turkey" },
+  { code: "TH", name: "Thailand" },
+  { code: "SG", name: "Singapore" },
+  { code: "MY", name: "Malaysia" },
+  { code: "ID", name: "Indonesia" },
+  { code: "FI", name: "Finland" },
+  { code: "SE", name: "Sweden" },
+  { code: "NO", name: "Norway" },
+  { code: "DK", name: "Denmark" },
+  { code: "IS", name: "Iceland" },
+  { code: "IE", name: "Ireland" },
+  { code: "PL", name: "Poland" },
+  { code: "CZ", name: "Czech Republic" },
+  { code: "HU", name: "Hungary" },
+  { code: "UA", name: "Ukraine" },
+  { code: "RO", name: "Romania" },
+  { code: "BG", name: "Bulgaria" },
+  { code: "EG", name: "Egypt" },
+  { code: "MA", name: "Morocco" },
+  { code: "NG", name: "Nigeria" },
+  { code: "KE", name: "Kenya" },
+];
 
 interface CountrySearchProps {
   onCountrySelect: (country: { code: string; name: string }) => void;
