@@ -119,7 +119,7 @@ export function CountrySearch({ onCountrySelect, selectedCountryCode }: CountryS
                 {filteredCountries.map(country => (
                   <CommandItem
                     key={country.code}
-                    value={country.code}
+                    value={country.name}
                     onSelect={() => {
                       onCountrySelect(country);
                       setOpen(false);
