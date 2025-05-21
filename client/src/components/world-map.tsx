@@ -208,7 +208,62 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
   const [zoom, setZoom] = useState(160); // Default zoom scale
   const [center, setCenter] = useState<[number, number]>([0, 0]); // [longitude, latitude]
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState<[number, number]>([0, 0]);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  
+  // Mouse/touch event handlers for dragging
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    setDragStart({ x: clientX, y: clientY });
+  };
+  
+  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDragging) return;
+    
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const dx = clientX - dragStart.x;
+    const dy = clientY - dragStart.y;
+    
+    // Scale the drag sensitivity based on zoom level
+    const sensitivity = 0.05 / (zoom / 160);
+    
+    // Update the map center based on drag distance
+    setCenter(prevCenter => [
+      prevCenter[0] - dx * sensitivity,
+      prevCenter[1] + dy * sensitivity
+    ]);
+    
+    // Reset drag start position
+    setDragStart({ x: clientX, y: clientY });
+  };
+  
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+  
+  // Register global mouse/touch event handlers
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove as any);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleMouseMove as any);
+      document.addEventListener('touchend', handleMouseUp);
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove as any);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleMouseMove as any);
+      document.removeEventListener('touchend', handleMouseUp);
+    };
+  }, [isDragging, dragStart]);
   
   // For responsiveness
   useEffect(() => {
@@ -314,16 +369,31 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
   }, []);
   
   return (
-    <div ref={mapContainerRef} className="relative overflow-hidden h-[400px] w-full">
+    <div 
+      ref={mapContainerRef} 
+      className="relative overflow-hidden h-[400px] w-full cursor-grab active:cursor-grabbing"
+      onMouseDown={handleMouseDown}
+      onTouchStart={handleMouseDown as any}
+    >
       {selectedCountry && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-black/75 text-white py-2 px-4 rounded-md shadow-lg transition-opacity duration-300">
           {selectedCountry}
         </div>
       )}
       
-      {/* Navigation Controls */}
+      {/* Drag indicator - only visible when not dragging */}
+      {!isDragging && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-5 text-black/30 text-center pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M11 17.001h2c.5 0 1-.4.5-.9L9 11.6c-.2-.3-.7-.3-1 0l-4.5 4.5c-.5.5 0 .9.5.9h2v3c0 .5.5 1 1 1h3c.6 0 1-.5 1-1v-3z" />
+            <path d="M13 7.001h-2c-.5 0-1 .4-.5.9l4.5 4.5c.2.3.7.3 1 0l4.5-4.5c.5-.5 0-.9-.5-.9h-2v-3c0-.5-.5-1-1-1h-3c-.6 0-1 .5-1 1v3z" />
+          </svg>
+          <div className="text-xs mt-1">Drag to move</div>
+        </div>
+      )}
+      
+      {/* Zoom Controls - keep these for convenience */}
       <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-2">
-        {/* Zoom Controls */}
         <button 
           onClick={handleZoomIn}
           className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
@@ -347,57 +417,18 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
         </button>
       </div>
       
-      {/* Pan Controls */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 grid grid-cols-3 gap-1">
-        <div></div>
-        <button 
-          onClick={() => panMap('up')}
-          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
-          aria-label="Pan up"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="18 15 12 9 6 15"></polyline>
-          </svg>
-        </button>
-        <div></div>
-        <button 
-          onClick={() => panMap('left')}
-          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
-          aria-label="Pan left"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-        </button>
+      {/* Reset button */}
+      <div className="absolute bottom-4 left-4 z-10">
         <button 
           onClick={() => goToRegion('world')}
-          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors flex items-center gap-1"
           aria-label="Reset view"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
           </svg>
+          <span className="text-xs">Reset</span>
         </button>
-        <button 
-          onClick={() => panMap('right')}
-          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
-          aria-label="Pan right"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </button>
-        <div></div>
-        <button 
-          onClick={() => panMap('down')}
-          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
-          aria-label="Pan down"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </button>
-        <div></div>
       </div>
       
       {/* Region Selector */}
