@@ -206,6 +206,9 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [zoom, setZoom] = useState(160); // Default zoom scale
+  const [center, setCenter] = useState<[number, number]>([0, 0]); // [longitude, latitude]
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState<[number, number]>([0, 0]);
   
   // For responsiveness
   useEffect(() => {
@@ -223,6 +226,57 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
   
   const handleZoomOut = () => {
     setZoom(prevZoom => Math.max(prevZoom - 50, 100)); // Limit minimum zoom level
+  };
+  
+  // Navigation buttons for panning
+  const panMap = (direction: 'up' | 'down' | 'left' | 'right') => {
+    const panAmount = 15 / (zoom / 160); // Adjust pan amount based on zoom level
+    
+    setCenter(prevCenter => {
+      const [lon, lat] = prevCenter;
+      switch (direction) {
+        case 'up':
+          return [lon, lat - panAmount];
+        case 'down':
+          return [lon, lat + panAmount];
+        case 'left':
+          return [lon + panAmount, lat];
+        case 'right':
+          return [lon - panAmount, lat];
+        default:
+          return prevCenter;
+      }
+    });
+  };
+  
+  // Preset regions to quickly jump to
+  const goToRegion = (region: 'world' | 'europe' | 'asia' | 'africa' | 'americas' | 'oceania') => {
+    switch (region) {
+      case 'world':
+        setZoom(160);
+        setCenter([0, 0]);
+        break;
+      case 'europe':
+        setZoom(400);
+        setCenter([15, 50]);
+        break;
+      case 'asia':
+        setZoom(250);
+        setCenter([100, 30]);
+        break;
+      case 'africa':
+        setZoom(250);
+        setCenter([20, 0]);
+        break;
+      case 'americas':
+        setZoom(200);
+        setCenter([-80, 0]);
+        break;
+      case 'oceania':
+        setZoom(250);
+        setCenter([140, -25]);
+        break;
+    }
   };
   
   // Create lookup maps for visited countries using various formats
@@ -267,8 +321,9 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
         </div>
       )}
       
-      {/* Zoom Controls */}
+      {/* Navigation Controls */}
       <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-2">
+        {/* Zoom Controls */}
         <button 
           onClick={handleZoomIn}
           className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
@@ -292,11 +347,107 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
         </button>
       </div>
       
+      {/* Pan Controls */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 grid grid-cols-3 gap-1">
+        <div></div>
+        <button 
+          onClick={() => panMap('up')}
+          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          aria-label="Pan up"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+        <div></div>
+        <button 
+          onClick={() => panMap('left')}
+          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          aria-label="Pan left"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button 
+          onClick={() => goToRegion('world')}
+          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          aria-label="Reset view"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+          </svg>
+        </button>
+        <button 
+          onClick={() => panMap('right')}
+          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          aria-label="Pan right"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+        <div></div>
+        <button 
+          onClick={() => panMap('down')}
+          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          aria-label="Pan down"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div></div>
+      </div>
+      
+      {/* Region Selector */}
+      <div className="absolute top-4 right-4 z-10">
+        <div className="bg-white p-2 rounded-md shadow-lg">
+          <div className="flex space-x-1">
+            <button 
+              onClick={() => goToRegion('asia')}
+              className="px-2 py-1 text-xs rounded hover:bg-blue-100 transition-colors"
+              aria-label="Go to Asia"
+            >
+              Asia
+            </button>
+            <button 
+              onClick={() => goToRegion('europe')}
+              className="px-2 py-1 text-xs rounded hover:bg-blue-100 transition-colors"
+              aria-label="Go to Europe"
+            >
+              Europe
+            </button>
+            <button 
+              onClick={() => goToRegion('africa')}
+              className="px-2 py-1 text-xs rounded hover:bg-blue-100 transition-colors"
+              aria-label="Go to Africa"
+            >
+              Africa
+            </button>
+            <button 
+              onClick={() => goToRegion('americas')}
+              className="px-2 py-1 text-xs rounded hover:bg-blue-100 transition-colors"
+              aria-label="Go to Americas"
+            >
+              Americas
+            </button>
+            <button 
+              onClick={() => goToRegion('oceania')}
+              className="px-2 py-1 text-xs rounded hover:bg-blue-100 transition-colors"
+              aria-label="Go to Oceania"
+            >
+              Oceania
+            </button>
+          </div>
+        </div>
+      </div>
+      
       <ComposableMap
         projection="geoEqualEarth"
         projectionConfig={{
           scale: zoom,
-          center: [0, 0]
+          center: center
         }}
         width={800}
         height={400}
