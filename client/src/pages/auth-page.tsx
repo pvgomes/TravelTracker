@@ -101,8 +101,11 @@ export default function AuthPage() {
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 font-montserrat">
               Track Your World Adventures
             </h1>
-            <p className="text-lg text-white opacity-90">
-              Register the countries you've visited and visualize your travels on an interactive world map
+            <p className="text-lg text-white opacity-90 mb-4">
+              Track the places you've visited in the world, share with your friends and see where is still missing to go.
+            </p>
+            <p className="text-md text-white opacity-80">
+              Create your personalized travel map, discover your next destinations, and connect with fellow travelers.
             </p>
           </div>
         </div>
