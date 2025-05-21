@@ -84,7 +84,12 @@ export default function StatisticsPage() {
   const continentCounts: Record<string, number> = {};
   const countriesByContinent: Record<string, string[]> = {};
   
+  // Track unique country codes to avoid double-counting
+  const uniqueCountryCodes = new Set<string>();
+  
+  // Add all visited countries
   visits.forEach(visit => {
+    uniqueCountryCodes.add(visit.countryCode);
     const continent = countryToContinentMap[visit.countryCode] || "Unknown";
     
     // Count countries per continent
@@ -100,6 +105,27 @@ export default function StatisticsPage() {
       countriesByContinent[continent].push(visit.countryName);
     }
   });
+  
+  // Add home country if it exists and is not already counted
+  if (user?.homeCountryCode && !uniqueCountryCodes.has(user.homeCountryCode)) {
+    const homeContinent = countryToContinentMap[user.homeCountryCode] || "Unknown";
+    
+    // Count home country in its continent
+    continentCounts[homeContinent] = (continentCounts[homeContinent] || 0) + 1;
+    
+    // Store home country in its continent list
+    if (!countriesByContinent[homeContinent]) {
+      countriesByContinent[homeContinent] = [];
+    }
+    
+    // Only add if not already in the list (which it shouldn't be)
+    if (user.homeCountryName && !countriesByContinent[homeContinent].includes(user.homeCountryName)) {
+      countriesByContinent[homeContinent].push(user.homeCountryName);
+    }
+    
+    // Add to uniqueCountryCodes set
+    uniqueCountryCodes.add(user.homeCountryCode);
+  }
   
   // Log any unknown country codes for debugging
   const unknownCountries = visits
@@ -134,7 +160,7 @@ export default function StatisticsPage() {
   
   // Calculate world coverage percentage (very approximate)
   const totalCountries = 195; // Approximate number of countries in the world
-  const worldPercentage = (visits.length / totalCountries * 100).toFixed(1);
+  const worldPercentage = (uniqueCountryCodes.size / totalCountries * 100).toFixed(1);
   
   return (
     <Layout>
@@ -151,7 +177,7 @@ export default function StatisticsPage() {
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-4xl font-bold text-center">{visits.length}</CardTitle>
+            <CardTitle className="text-4xl font-bold text-center">{uniqueCountryCodes.size}</CardTitle>
             <CardDescription className="text-center">Countries Visited</CardDescription>
           </CardHeader>
         </Card>
@@ -264,7 +290,7 @@ export default function StatisticsPage() {
                   />
                   <h4 className="text-lg font-semibold">{continent.name}</h4>
                   <span className="text-sm text-muted-foreground">
-                    ({continent.value} countries - {((continent.value / visits.length) * 100).toFixed(1)}%)
+                    ({continent.value} countries - {((continent.value / uniqueCountryCodes.size) * 100).toFixed(1)}%)
                   </span>
                 </div>
                 <p className="text-sm pt-2">
