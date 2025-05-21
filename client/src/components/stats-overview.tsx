@@ -90,10 +90,20 @@ function getCountryVisitStatus(countryCode: string, visits: Visit[]) {
   return 'none';
 }
 
-export function StatsOverview({ visits }: StatsOverviewProps) {
+interface ExtendedStatsOverviewProps extends StatsOverviewProps {
+  homeCountryCode?: string;
+}
+
+export function StatsOverview({ visits, homeCountryCode }: ExtendedStatsOverviewProps) {
   // Get unique country codes from visits
   const countryCodesSet = new Set<string>();
   visits.forEach(visit => countryCodesSet.add(visit.countryCode));
+  
+  // Add home country to the set of visited countries if it exists and not already added
+  if (homeCountryCode && !countryCodesSet.has(homeCountryCode)) {
+    countryCodesSet.add(homeCountryCode);
+  }
+  
   const uniqueCountryCodes = Array.from(countryCodesSet);
   
   // Categorize countries by visit status
@@ -136,12 +146,14 @@ export function StatsOverview({ visits }: StatsOverviewProps) {
   const worldPercentage = (countriesVisited / totalCountries * 100).toFixed(1);
   
   // Last trip
-  const sortedVisits = [...visits].sort((a, b) => 
-    new Date(b.visitDate).getTime() - new Date(a.visitDate).getTime()
-  );
+  const sortedVisits = [...visits].sort((a, b) => {
+    if (!a.visitDate) return 1;
+    if (!b.visitDate) return -1;
+    return new Date(b.visitDate as string).getTime() - new Date(a.visitDate as string).getTime();
+  });
   
-  const lastTrip = sortedVisits.length > 0 
-    ? `${sortedVisits[0].countryName} (${format(new Date(sortedVisits[0].visitDate), "MMM yyyy")})`
+  const lastTrip = sortedVisits.length > 0 && sortedVisits[0].visitDate
+    ? `${sortedVisits[0].countryName} (${format(new Date(sortedVisits[0].visitDate as string), "MMM yyyy")})`
     : "None yet";
   
   return (

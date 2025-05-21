@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { StatsOverview } from "@/components/stats-overview";
 
 export default function HomePage() {
   const [addCountryOpen, setAddCountryOpen] = useState(false);
@@ -93,36 +94,11 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Simple stats cards */}
-      <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 bg-primary rounded-md p-3">
-                <GlobeIcon className="h-5 w-5 text-white" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <div className="text-sm font-medium text-muted-foreground truncate">Countries Visited</div>
-                <div className="text-lg font-semibold">{countriesVisited}</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 bg-primary rounded-md p-3">
-                <CalendarIcon className="h-5 w-5 text-white" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <div className="text-sm font-medium text-muted-foreground truncate">Last Trip</div>
-                <div className="text-lg font-semibold truncate">{lastTrip}</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Stats Overview */}
+      <StatsOverview 
+        visits={visits} 
+        homeCountryCode={user?.homeCountryCode ? String(user.homeCountryCode) : undefined} 
+      />
       
       {/* World Map */}
       <div className="mt-6 bg-white dark:bg-card overflow-hidden shadow rounded-lg p-4">
