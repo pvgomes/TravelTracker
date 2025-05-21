@@ -49,9 +49,13 @@ Create a PostgreSQL database and configure the connection string:
 - Add the following environment variables:
 
 ```
-DATABASE_URL=postgresql://username:password@localhost:5432/travel_tracker
+DATABASE_URL=postgresql://traveltracker:traveltrackerpassword@localhost:5432/travel_tracker
 SESSION_SECRET=your_session_secret_here
 ```
+
+still WIP untill fix local environment well using local postgree
+;DATABASE_URL=postgresql://traveltracker:traveltrackerpassword@localhost:5432/travel_tracker
+
 
 Replace `username`, `password`, and `travel_tracker` with your PostgreSQL credentials and desired database name.
 
@@ -59,6 +63,11 @@ Replace `username`, `password`, and `travel_tracker` with your PostgreSQL creden
 ```
 export $(cat .env | xargs)
 echo $DATABASE_URL
+```
+
+#### 3.3 Create database if doesn't exist yet
+```
+psql "postgresql://traveltracker:traveltrackerpassword@localhost:5432/postgres" -c "CREATE DATABASE travel_tracker;"
 ```
 
 ### 4. Set up the database schema
