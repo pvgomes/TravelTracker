@@ -205,6 +205,7 @@ function getCountryVisitStatus(countryCode: string, visits: Visit[]) {
 export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(160); // Default zoom scale
   
   // For responsiveness
   useEffect(() => {
@@ -215,6 +216,14 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+  
+  const handleZoomIn = () => {
+    setZoom(prevZoom => Math.min(prevZoom + 50, 600)); // Limit maximum zoom level
+  };
+  
+  const handleZoomOut = () => {
+    setZoom(prevZoom => Math.max(prevZoom - 50, 100)); // Limit minimum zoom level
+  };
   
   // Create lookup maps for visited countries using various formats
   const visitedCountryData = useMemo(() => {
@@ -257,10 +266,36 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
           {selectedCountry}
         </div>
       )}
+      
+      {/* Zoom Controls */}
+      <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-2">
+        <button 
+          onClick={handleZoomIn}
+          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          aria-label="Zoom in"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+        </button>
+        <button 
+          onClick={handleZoomOut}
+          className="bg-white text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          aria-label="Zoom out"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+      
       <ComposableMap
         projection="geoEqualEarth"
         projectionConfig={{
-          scale: 160,
+          scale: zoom,
           center: [0, 0]
         }}
         width={800}
