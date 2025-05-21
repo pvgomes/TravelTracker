@@ -340,6 +340,7 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
     const codes3 = new Set<string>(); // 3-letter codes
     const names = new Set<string>(); // Full country names
     
+    // Add all visited countries
     visits.forEach(visit => {
       // Store the country code (usually 2-letter code)
       const code = visit.countryCode;
@@ -357,8 +358,24 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
       });
     });
     
+    // Add home country if provided
+    if (homeCountryCode) {
+      codes2.add(homeCountryCode);
+      
+      if (homeCountryName) {
+        names.add(homeCountryName);
+      }
+      
+      // Find the 3-letter code for the home country
+      Object.entries(countryMapping).forEach(([name, codes]) => {
+        if (name === homeCountryName || codes[0] === homeCountryCode) {
+          if (codes[1]) codes3.add(codes[1]); // Add 3-letter code
+        }
+      });
+    }
+    
     return { codes2, codes3, names };
-  }, [visits]);
+  }, [visits, homeCountryCode, homeCountryName]);
   
   // Debug log of visited countries only once during initialization
   useEffect(() => {
