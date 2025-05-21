@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { Visit } from "@shared/schema";
 import { State } from "country-state-city";
@@ -204,6 +204,7 @@ function getCountryVisitStatus(countryCode: string, visits: Visit[]) {
 
 export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   
   // For responsiveness
   useEffect(() => {
@@ -250,7 +251,12 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
   }, []);
   
   return (
-    <div ref={mapContainerRef} className="overflow-hidden h-[400px] w-full">
+    <div ref={mapContainerRef} className="relative overflow-hidden h-[400px] w-full">
+      {selectedCountry && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-black/75 text-white py-2 px-4 rounded-md shadow-lg transition-opacity duration-300">
+          {selectedCountry}
+        </div>
+      )}
       <ComposableMap
         projection="geoEqualEarth"
         projectionConfig={{
@@ -346,6 +352,13 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
                       fill: hoverFillColor,
                       outline: "none",
                     },
+                  }}
+                  onClick={() => {
+                    setSelectedCountry(countryName);
+                    // Auto-hide the tooltip after 3 seconds
+                    setTimeout(() => {
+                      setSelectedCountry(null);
+                    }, 3000);
                   }}
                   className="transition-colors duration-300"
                 />
