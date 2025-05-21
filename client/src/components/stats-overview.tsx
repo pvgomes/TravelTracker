@@ -114,12 +114,18 @@ export function StatsOverview({ visits, homeCountryCode }: ExtendedStatsOverview
   };
   
   uniqueCountryCodes.forEach(code => {
-    const status = getCountryVisitStatus(code, visits);
-    visitStats[status] += 1;
+    // For home country, always count it as fully visited
+    if (code === homeCountryCode) {
+      visitStats.full += 1;
+    } else {
+      const status = getCountryVisitStatus(code, visits);
+      visitStats[status] += 1;
+    }
   });
   
   // Total countries visited (fully or partially)
-  const countriesVisited = visitStats.full + visitStats.partial;
+  // Add 1 for home country if it exists and isn't already counted in visits
+  const countriesVisited = uniqueCountryCodes.length;
   
   // Continents explored
   const continentsSet = new Set<string>();
