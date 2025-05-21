@@ -123,12 +123,22 @@ export function StatsOverview({ visits, homeCountryCode }: ExtendedStatsOverview
   
   // Continents explored
   const continentsSet = new Set<string>();
+  
+  // Add continents from visits
   visits.forEach(visit => {
     const continent = countryToContinentMap[visit.countryCode];
     if (continent && continent !== "Unknown") {
       continentsSet.add(continent);
     }
   });
+  
+  // Add home country's continent if it exists
+  if (homeCountryCode) {
+    const homeContinent = countryToContinentMap[homeCountryCode];
+    if (homeContinent && homeContinent !== "Unknown") {
+      continentsSet.add(homeContinent);
+    }
+  }
   
   const continentsVisited = continentsSet.size;
   
