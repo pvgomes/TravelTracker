@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#1e293b"/>
+  <circle cx="600" cy="290" r="180" fill="#10B981" fill-opacity="0.1" stroke="#10B981" stroke-width="12"/>
+  <circle cx="600" cy="290" r="150" fill="white" stroke="#10B981" stroke-width="8"/>
+  <path d="M600 140C600 140 500 240 500 290C500 340 545 380 600 380C655 380 700 340 700 290C700 240 600 140 600 140Z" fill="#10B981" fill-opacity="0.3" stroke="#10B981" stroke-width="8"/>
+  <circle cx="600" cy="290" r="18" fill="#f97316"/>
+  <path d="M604 270C604 270 634 220 664 250C694 280 674 330 634 330" stroke="#f97316" stroke-width="8" stroke-linecap="round"/>
+  <path d="M596 270C596 270 566 220 536 250C506 280 526 330 566 330" stroke="#10B981" stroke-width="8" stroke-linecap="round"/>
+  
+  <text x="600" y="480" font-family="Arial, sans-serif" font-size="60" font-weight="bold" fill="white" text-anchor="middle">TravelTracker</text>
+  <text x="600" y="540" font-family="Arial, sans-serif" font-size="32" fill="#94a3b8" text-anchor="middle">Track, share, and explore your global adventures</text>
+</svg>

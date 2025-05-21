@@ -70,15 +70,17 @@ export default function SharedMapPage() {
   }
 
   // Sort visits by date (most recent first)
-  const sortedVisits = [...data.visits].sort((a, b) => 
-    new Date(b.visitDate).getTime() - new Date(a.visitDate).getTime()
-  );
+  const sortedVisits = [...data.visits].sort((a, b) => {
+    if (!a.visitDate) return 1;
+    if (!b.visitDate) return -1;
+    return new Date(b.visitDate as string).getTime() - new Date(a.visitDate as string).getTime();
+  });
   
   // Get counts and statistics
   const countryCount = new Set(data.visits.map(v => v.countryCode)).size;
   const cityCount = data.visits.length;
-  const lastVisit = sortedVisits.length > 0 
-    ? `${sortedVisits[0].countryName} (${format(new Date(sortedVisits[0].visitDate), "MMM yyyy")})` 
+  const lastVisit = sortedVisits.length > 0 && sortedVisits[0].visitDate
+    ? `${sortedVisits[0].countryName} (${format(new Date(sortedVisits[0].visitDate as string), "MMM yyyy")})` 
     : "None";
   
   return (
@@ -90,7 +92,7 @@ export default function SharedMapPage() {
               {data.fullName}'s Travel Map
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Shared Travel Adventures
+              Explore {data.fullName}'s journey across {countryCount} countries and {cityCount} cities!
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={copyShareLink}>
@@ -195,7 +197,7 @@ export default function SharedMapPage() {
                     <tr key={visit.id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{visit.countryName}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        {format(new Date(visit.visitDate), 'MMM d, yyyy')}
+                        {visit.visitDate ? format(new Date(visit.visitDate as string), 'MMM yyyy') : 'Date unknown'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {visit.city}
@@ -210,8 +212,11 @@ export default function SharedMapPage() {
           <Separator className="my-6" />
           
           <div className="text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+              Inspired by {data.fullName}'s adventures? Create your own travel map!
+            </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Create your own travel map by signing up for a free account.
+              Track your visited countries, share with friends, and see where to go next.
             </p>
             <Button className="mt-4" asChild>
               <a href="/auth">Start Your Travel Map</a>
