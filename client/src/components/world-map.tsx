@@ -431,48 +431,7 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
         </button>
       </div>
       
-      {/* Region Selector */}
-      <div className="absolute top-4 right-4 z-10">
-        <div className="bg-white p-2 rounded-md shadow-lg">
-          <div className="flex space-x-1">
-            <button 
-              onClick={() => goToRegion('asia')}
-              className="px-2 py-1 text-xs rounded hover:bg-blue-100 transition-colors"
-              aria-label="Go to Asia"
-            >
-              Asia
-            </button>
-            <button 
-              onClick={() => goToRegion('europe')}
-              className="px-2 py-1 text-xs rounded hover:bg-blue-100 transition-colors"
-              aria-label="Go to Europe"
-            >
-              Europe
-            </button>
-            <button 
-              onClick={() => goToRegion('africa')}
-              className="px-2 py-1 text-xs rounded hover:bg-blue-100 transition-colors"
-              aria-label="Go to Africa"
-            >
-              Africa
-            </button>
-            <button 
-              onClick={() => goToRegion('americas')}
-              className="px-2 py-1 text-xs rounded hover:bg-blue-100 transition-colors"
-              aria-label="Go to Americas"
-            >
-              Americas
-            </button>
-            <button 
-              onClick={() => goToRegion('oceania')}
-              className="px-2 py-1 text-xs rounded hover:bg-blue-100 transition-colors"
-              aria-label="Go to Oceania"
-            >
-              Oceania
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Continent buttons removed for better mobile experience */}
       
       <ComposableMap
         projection="geoEqualEarth"
