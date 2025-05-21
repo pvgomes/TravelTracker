@@ -77,8 +77,36 @@ export default function SharedMapPage() {
   });
   
   // Get counts and statistics
-  const countryCount = new Set(data.visits.map(v => v.countryCode)).size;
+  const visitedCountryCodes = new Set(data.visits.map(v => v.countryCode));
+  
+  // Add home country to statistics if it exists
+  if (data.homeCountryCode && !visitedCountryCodes.has(data.homeCountryCode)) {
+    visitedCountryCodes.add(data.homeCountryCode);
+  }
+  
+  const countryCount = visitedCountryCodes.size;
   const cityCount = data.visits.length;
+  
+  // Calculate continents explored
+  const continentMapping: Record<string, string> = {
+    'US': 'North America', 'CA': 'North America', 'MX': 'North America', 
+    'BR': 'South America', 'AR': 'South America', 'CO': 'South America',
+    'GB': 'Europe', 'FR': 'Europe', 'DE': 'Europe', 'IT': 'Europe', 'ES': 'Europe',
+    'CN': 'Asia', 'JP': 'Asia', 'IN': 'Asia', 'RU': 'Asia',
+    'AU': 'Oceania', 'NZ': 'Oceania',
+    'ZA': 'Africa', 'EG': 'Africa', 'NG': 'Africa',
+    'AQ': 'Antarctica'
+  };
+  
+  const continentsExplored = new Set(
+    Array.from(visitedCountryCodes)
+      .map(code => continentMapping[code] || 'Unknown')
+      .filter(continent => continent !== 'Unknown')
+  );
+  
+  // World exploration percentage (approx. 195 countries in the world)
+  const worldExploredPercentage = Math.round((countryCount / 195) * 100);
+  
   const lastVisit = sortedVisits.length > 0 && sortedVisits[0].visitDate
     ? `${sortedVisits[0].countryName} (${format(new Date(sortedVisits[0].visitDate as string), "MMM yyyy")})` 
     : "None";
@@ -102,7 +130,7 @@ export default function SharedMapPage() {
         </div>
         
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center">
@@ -131,8 +159,42 @@ export default function SharedMapPage() {
             </CardContent>
           </Card>
           
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-white">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                    <line x1="4" y1="22" x2="4" y2="15"></line>
+                  </svg>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <div className="text-sm font-medium text-muted-foreground truncate">Continents Explored</div>
+                  <div className="text-lg font-semibold">{continentsExplored.size} / 7</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-white">
+                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                    <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                  </svg>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <div className="text-sm font-medium text-muted-foreground truncate">World Explored</div>
+                  <div className="text-lg font-semibold">{worldExploredPercentage}%</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
           {data.homeCountryName && (
-            <Card>
+            <Card className="sm:col-span-2 md:col-span-1">
               <CardContent className="p-4">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 bg-orange-500 rounded-md p-3">
