@@ -62,32 +62,13 @@ interface StatsOverviewProps {
   visits: Visit[];
 }
 
-// Function to determine if a country has been fully or partially visited
+// Function to determine if a country has been visited
 function getCountryVisitStatus(countryCode: string, visits: Visit[]) {
   // Get all visits for this country
   const countryVisits = visits.filter(v => v.countryCode === countryCode);
   
-  if (countryVisits.length === 0) {
-    return 'none'; // No visits to this country
-  }
-  
-  // For now, mark every country with at least one visit as fully visited
-  // to avoid any possible performance issues with State API calls
-  const hasVisits = countryVisits.length > 0;
-  if (hasVisits) {
-    // Check if any visit has a state specified
-    const hasStateInfo = countryVisits.some(visit => Boolean(visit.state));
-    if (!hasStateInfo) {
-      return 'full'; // No state info, consider it fully visited
-    }
-    
-    // Randomly assign full or partial status based on a predefined set
-    // This is a temporary solution to demonstrate the UI without causing performance issues
-    const partialCountries = ['US', 'BR', 'IN', 'CN', 'RU', 'AU', 'CA'];
-    return partialCountries.includes(countryCode) ? 'partial' : 'full';
-  }
-  
-  return 'none';
+  // Simple: if there are any visits to this country, it's considered visited
+  return countryVisits.length > 0 ? 'visited' : 'none';
 }
 
 interface ExtendedStatsOverviewProps extends StatsOverviewProps {
@@ -106,25 +87,7 @@ export function StatsOverview({ visits, homeCountryCode }: ExtendedStatsOverview
   
   const uniqueCountryCodes = Array.from(countryCodesSet);
   
-  // Categorize countries by visit status
-  const visitStats = {
-    full: 0,
-    partial: 0,
-    none: 0
-  };
-  
-  uniqueCountryCodes.forEach(code => {
-    // For home country, always count it as fully visited
-    if (code === homeCountryCode) {
-      visitStats.full += 1;
-    } else {
-      const status = getCountryVisitStatus(code, visits);
-      visitStats[status] += 1;
-    }
-  });
-  
-  // Total countries visited (fully or partially)
-  // Add 1 for home country if it exists and isn't already counted in visits
+  // All countries in our list are considered visited
   const countriesVisited = uniqueCountryCodes.length;
   
   // Continents explored
@@ -173,7 +136,7 @@ export function StatsOverview({ visits, homeCountryCode }: ExtendedStatsOverview
     : "None yet";
   
   return (
-    <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
+    <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center">
@@ -188,24 +151,7 @@ export function StatsOverview({ visits, homeCountryCode }: ExtendedStatsOverview
         </CardContent>
       </Card>
       
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center">
-            <div className="flex-shrink-0 bg-[#10b981] rounded-md p-3">
-              <ClipboardListIcon className="h-5 w-5 text-white" />
-            </div>
-            <div className="ml-5 w-0 flex-1">
-              <div className="text-sm font-medium text-muted-foreground truncate">Visit Status</div>
-              <div className="text-sm">
-                <span className="text-lg font-semibold">{visitStats.full}</span> Full
-                <span className="mx-1">·</span>
-                <span className="text-lg font-semibold">{visitStats.partial}</span> Partial
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
+
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center">
