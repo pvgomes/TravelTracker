@@ -211,59 +211,102 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   
-  // Mouse/touch event handlers for dragging
-  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+  // Enhanced touch/mouse event handlers for smooth dragging
+  const handlePointerDown = (e: React.PointerEvent) => {
     e.preventDefault();
     setIsDragging(true);
+    setSelectedCountry(null); // Clear any selected country
     
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    setDragStart({ x: e.clientX, y: e.clientY });
     
-    setDragStart({ x: clientX, y: clientY });
+    // Capture pointer for smooth tracking on mobile
+    if (mapContainerRef.current) {
+      mapContainerRef.current.setPointerCapture(e.pointerId);
+    }
   };
   
-  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
+  const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDragging) return;
     
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    e.preventDefault();
     
-    const dx = clientX - dragStart.x;
-    const dy = clientY - dragStart.y;
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
     
-    // Scale the drag sensitivity based on zoom level
-    const sensitivity = 0.05 / (zoom / 160);
+    // More responsive sensitivity for smooth Google Maps-like movement
+    const sensitivity = 0.2 / (zoom / 160);
     
-    // Update the map center based on drag distance
+    // Update the map center with smooth movement
     setCenter(prevCenter => [
       prevCenter[0] - dx * sensitivity,
       prevCenter[1] + dy * sensitivity
     ]);
     
-    // Reset drag start position
-    setDragStart({ x: clientX, y: clientY });
+    // Update drag start for continuous smooth movement
+    setDragStart({ x: e.clientX, y: e.clientY });
   };
   
-  const handleMouseUp = () => {
+  const handlePointerUp = (e: React.PointerEvent) => {
+    setIsDragging(false);
+    
+    // Release pointer capture
+    if (mapContainerRef.current) {
+      mapContainerRef.current.releasePointerCapture(e.pointerId);
+    }
+  };
+  
+  // Fallback touch handlers for better mobile support
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      e.preventDefault();
+      setIsDragging(true);
+      setSelectedCountry(null);
+      
+      const touch = e.touches[0];
+      setDragStart({ x: touch.clientX, y: touch.clientY });
+    }
+  };
+  
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || e.touches.length !== 1) return;
+    
+    e.preventDefault();
+    
+    const touch = e.touches[0];
+    const dx = touch.clientX - dragStart.x;
+    const dy = touch.clientY - dragStart.y;
+    
+    const sensitivity = 0.2 / (zoom / 160);
+    
+    setCenter(prevCenter => [
+      prevCenter[0] - dx * sensitivity,
+      prevCenter[1] + dy * sensitivity
+    ]);
+    
+    setDragStart({ x: touch.clientX, y: touch.clientY });
+  };
+  
+  const handleTouchEnd = () => {
     setIsDragging(false);
   };
   
-  // Register global mouse/touch event handlers
+  // Prevent scrolling and other default behaviors when dragging
   useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove as any);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.addEventListener('touchmove', handleMouseMove as any);
-      document.addEventListener('touchend', handleMouseUp);
+    if (isDragging && mapContainerRef.current) {
+      const preventDefault = (e: Event) => e.preventDefault();
+      
+      // Prevent scrolling and zooming on mobile while dragging
+      document.addEventListener('touchmove', preventDefault, { passive: false });
+      document.addEventListener('gesturestart', preventDefault);
+      document.addEventListener('gesturechange', preventDefault);
+      
+      return () => {
+        document.removeEventListener('touchmove', preventDefault);
+        document.removeEventListener('gesturestart', preventDefault);
+        document.removeEventListener('gesturechange', preventDefault);
+      };
     }
-    
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove as any);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchmove', handleMouseMove as any);
-      document.removeEventListener('touchend', handleMouseUp);
-    };
-  }, [isDragging, dragStart]);
+  }, [isDragging]);
   
   // For responsiveness
   useEffect(() => {
@@ -388,9 +431,14 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
   return (
     <div 
       ref={mapContainerRef} 
-      className="relative overflow-hidden h-[400px] w-full cursor-grab active:cursor-grabbing"
-      onMouseDown={handleMouseDown}
-      onTouchStart={handleMouseDown as any}
+      className="relative overflow-hidden h-[400px] w-full cursor-grab active:cursor-grabbing touch-none"
+      style={{ touchAction: 'none' }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {selectedCountry && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-black/75 text-white py-2 px-4 rounded-md shadow-lg transition-opacity duration-300">
