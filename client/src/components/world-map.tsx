@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { Visit } from "@shared/schema";
-import { State } from "country-state-city";
+import { getCountryByCode, COUNTRIES } from "@/data/countries";
 
 // Using a reliable TopoJSON map URL
 const WORLD_MAP_URL = "https://unpkg.com/world-atlas@2.0.2/countries-110m.json";

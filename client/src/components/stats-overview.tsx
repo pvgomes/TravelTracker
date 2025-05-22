@@ -41,29 +41,29 @@ export function StatsOverview({ visits, homeCountryCode }: ExtendedStatsOverview
   
   // Add continents from visits
   visits.forEach(visit => {
-    const continent = countryToContinentMap[visit.countryCode];
-    if (continent && continent !== "Unknown") {
-      continentsSet.add(continent);
+    const country = getCountryByCode(visit.countryCode);
+    if (country?.continent) {
+      continentsSet.add(country.continent);
     }
   });
   
   // Add home country's continent if it exists
   if (homeCountryCode) {
-    const homeContinent = countryToContinentMap[homeCountryCode];
-    if (homeContinent && homeContinent !== "Unknown") {
-      continentsSet.add(homeContinent);
+    const homeCountry = getCountryByCode(homeCountryCode);
+    if (homeCountry?.continent) {
+      continentsSet.add(homeCountry.continent);
     }
   }
   
   const continentsVisited = continentsSet.size;
   
-  // Disable logging to prevent potential call stack issues
+  // Check for countries not in our centralized data (for debugging)
   // const unknownCountries = visits
-  //   .filter(visit => !countryToContinentMap[visit.countryCode])
+  //   .filter(visit => !getCountryByCode(visit.countryCode))
   //   .map(visit => `${visit.countryName} (${visit.countryCode})`);
   
   // if (unknownCountries.length > 0) {
-  //   console.log("Countries not mapped to continents:", unknownCountries);
+  //   console.log("Countries not in centralized data:", unknownCountries);
   // }
   
   // World exploration percentage (very approximate)
