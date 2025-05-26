@@ -264,39 +264,83 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
     }
   };
   
-  // Fallback touch handlers for better mobile support
+  // Enhanced mobile touch handlers with pinch zoom
+  const [lastTouchDistance, setLastTouchDistance] = useState<number | null>(null);
+  
+  const getTouchDistance = (touches: TouchList) => {
+    if (touches.length < 2) return null;
+    const touch1 = touches[0];
+    const touch2 = touches[1];
+    return Math.sqrt(
+      Math.pow(touch2.clientX - touch1.clientX, 2) + 
+      Math.pow(touch2.clientY - touch1.clientY, 2)
+    );
+  };
+  
   const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    
     if (e.touches.length === 1) {
-      e.preventDefault();
-      setIsDragging(true);
-      setSelectedCountry(null);
-      
+      // Single touch - prepare for dragging
       const touch = e.touches[0];
+      setIsDragging(true);
+      setHasMoved(false);
       setDragStart({ x: touch.clientX, y: touch.clientY });
+    } else if (e.touches.length === 2) {
+      // Two touches - prepare for pinch zoom
+      setIsDragging(false);
+      const distance = getTouchDistance(e.touches);
+      setLastTouchDistance(distance);
     }
   };
   
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || e.touches.length !== 1) return;
-    
     e.preventDefault();
     
-    const touch = e.touches[0];
-    const dx = touch.clientX - dragStart.x;
-    const dy = touch.clientY - dragStart.y;
-    
-    const sensitivity = 0.2 / (zoom / 160);
-    
-    setCenter(prevCenter => [
-      prevCenter[0] - dx * sensitivity,
-      prevCenter[1] + dy * sensitivity
-    ]);
-    
-    setDragStart({ x: touch.clientX, y: touch.clientY });
+    if (e.touches.length === 1 && isDragging) {
+      // Single touch drag
+      const touch = e.touches[0];
+      const dx = touch.clientX - dragStart.x;
+      const dy = touch.clientY - dragStart.y;
+      
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance > 8) { // Slightly higher threshold for mobile
+        setHasMoved(true);
+        
+        const sensitivity = 0.4 / (zoom / 160); // More sensitive for mobile
+        
+        setCenter(prevCenter => [
+          prevCenter[0] - dx * sensitivity,
+          prevCenter[1] + dy * sensitivity
+        ]);
+        
+        setDragStart({ x: touch.clientX, y: touch.clientY });
+      }
+    } else if (e.touches.length === 2) {
+      // Two finger pinch zoom
+      const currentDistance = getTouchDistance(e.touches);
+      if (lastTouchDistance && currentDistance) {
+        const deltaDistance = currentDistance - lastTouchDistance;
+        const zoomFactor = 1 + (deltaDistance * 0.005); // Smooth zoom factor
+        
+        setZoom(prevZoom => {
+          const newZoom = prevZoom * zoomFactor;
+          return Math.max(80, Math.min(1000, newZoom)); // Wider zoom range
+        });
+        
+        setLastTouchDistance(currentDistance);
+      }
+    }
   };
   
-  const handleTouchEnd = () => {
-    setIsDragging(false);
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length === 0) {
+      setIsDragging(false);
+      setLastTouchDistance(null);
+    } else if (e.touches.length === 1) {
+      // Still one finger, reset pinch zoom tracking
+      setLastTouchDistance(null);
+    }
   };
   
   // Prevent scrolling and other default behaviors when dragging
