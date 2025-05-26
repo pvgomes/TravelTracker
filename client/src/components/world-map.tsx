@@ -208,13 +208,18 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
   const [zoom, setZoom] = useState(160); // Default zoom scale
   const [center, setCenter] = useState<[number, number]>([0, 0]); // [longitude, latitude]
   const [isDragging, setIsDragging] = useState(false);
+  const [hasMoved, setHasMoved] = useState(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   
   // Enhanced touch/mouse event handlers for smooth dragging
   const handlePointerDown = (e: React.PointerEvent) => {
-    e.preventDefault();
+    // Only prevent default if clicking on the container, not on countries
+    if (e.target === mapContainerRef.current) {
+      e.preventDefault();
+    }
     setIsDragging(true);
+    setHasMoved(false);
     
     setDragStart({ x: e.clientX, y: e.clientY });
     
@@ -227,22 +232,27 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDragging) return;
     
-    e.preventDefault();
-    
     const dx = e.clientX - dragStart.x;
     const dy = e.clientY - dragStart.y;
     
-    // More responsive sensitivity for smooth Google Maps-like movement
-    const sensitivity = 0.2 / (zoom / 160);
-    
-    // Update the map center with smooth movement
-    setCenter(prevCenter => [
-      prevCenter[0] - dx * sensitivity,
-      prevCenter[1] + dy * sensitivity
-    ]);
-    
-    // Update drag start for continuous smooth movement
-    setDragStart({ x: e.clientX, y: e.clientY });
+    // Check if the user has moved enough to be considered dragging (not just clicking)
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance > 5) {
+      setHasMoved(true);
+      e.preventDefault();
+      
+      // More responsive sensitivity for smooth Google Maps-like movement
+      const sensitivity = 0.2 / (zoom / 160);
+      
+      // Update the map center with smooth movement
+      setCenter(prevCenter => [
+        prevCenter[0] - dx * sensitivity,
+        prevCenter[1] + dy * sensitivity
+      ]);
+      
+      // Update drag start for continuous smooth movement
+      setDragStart({ x: e.clientX, y: e.clientY });
+    }
   };
   
   const handlePointerUp = (e: React.PointerEvent) => {
@@ -595,12 +605,16 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
                       outline: "none",
                     },
                   }}
-                  onClick={() => {
-                    setSelectedCountry(countryName);
-                    // Auto-hide the tooltip after 3 seconds
-                    setTimeout(() => {
-                      setSelectedCountry(null);
-                    }, 3000);
+                  onClick={(e) => {
+                    // Only handle click if user didn't drag
+                    if (!hasMoved) {
+                      e.stopPropagation();
+                      setSelectedCountry(countryName);
+                      // Auto-hide the tooltip after 3 seconds
+                      setTimeout(() => {
+                        setSelectedCountry(null);
+                      }, 3000);
+                    }
                   }}
                   className="transition-colors duration-300"
                 />
