@@ -26,20 +26,8 @@ Before you begin, ensure you have the following installed:
 
 ## Local Setup
 
-Follow these steps to set up the project locally:
+Follow these [steps](local.md)
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/yourusername/travel-tracker.git
-cd travel-tracker
-```
-
-### 2. Install dependencies
-
-```bash
-npm install
-```
 
 ### 3. Configure the database
 
