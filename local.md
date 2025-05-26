@@ -88,7 +88,10 @@ This command will:
 npm run dev
 ```
 
-The application will start on `http://localhost:5000`
+The application will now:
+- Load your `.env` file automatically
+- Show "📊 Using local PostgreSQL" in the console
+- Start on `http://localhost:5000`
 
 ## Database Management
 
