@@ -215,7 +215,6 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
   const handlePointerDown = (e: React.PointerEvent) => {
     e.preventDefault();
     setIsDragging(true);
-    setSelectedCountry(null); // Clear any selected country
     
     setDragStart({ x: e.clientX, y: e.clientY });
     
@@ -441,8 +440,10 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
       onTouchEnd={handleTouchEnd}
     >
       {selectedCountry && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-black/75 text-white py-2 px-4 rounded-md shadow-lg transition-opacity duration-300">
-          {selectedCountry}
+        <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-10 bg-black/90 text-white py-3 px-6 rounded-lg shadow-xl transition-all duration-300">
+          <div className="text-xl font-semibold text-center">
+            {selectedCountry}
+          </div>
         </div>
       )}
       
