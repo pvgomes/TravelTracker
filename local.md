@@ -13,38 +13,15 @@ This guide will help you run the Travel Tracker application locally using Docker
 ### 1. Clone and Install Dependencies
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/yourusername/travel-tracker.git
 cd travel-tracker
 npm install
 ```
 
-### 2. Start Local PostgreSQL with Docker
+### 2. Start docker
 
-Since you already have Docker running with PostgreSQL, ensure your `docker-compose.yml` includes:
-
-```yaml
-version: '3.8'
-services:
-  postgres:
-    image: postgres:14
-    container_name: traveltracker_postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: traveltracker
-      POSTGRES_PASSWORD: traveltrackerpassword
-      POSTGRES_DB: travel_tracker
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
-```
-
-Start the database:
 ```bash
-docker-compose up -d postgres
+docker compose up
 ```
 
 ### 3. Configure Environment Variables
@@ -115,7 +92,7 @@ docker-compose down
 docker volume rm <project>_postgres_data
 
 # Restart
-docker-compose up -d postgres
+docker compose up -d
 npm run db:push
 ```
 
