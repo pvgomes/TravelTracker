@@ -162,7 +162,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get a specific visit by ID
+  /**
+   * @swagger
+   * /visits/{id}:
+   *   get:
+   *     summary: Get a specific visit by ID
+   *     description: Retrieve details of a specific visit by its unique identifier
+   *     tags: [Visits]
+   *     security:
+   *       - sessionAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         description: Unique identifier of the visit
+   *         schema:
+   *           type: integer
+   *           example: 1
+   *     responses:
+   *       200:
+   *         description: Visit retrieved successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Visit'
+   *       400:
+   *         description: Invalid visit ID
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       401:
+   *         description: User not authenticated
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       403:
+   *         description: Access denied - visit belongs to another user
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       404:
+   *         description: Visit not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   */
   app.get("/api/visits/:id", isAuthenticated, async (req, res) => {
     const userId = req.user!.id;
     const visitId = parseInt(req.params.id, 10);
