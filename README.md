@@ -29,51 +29,6 @@ Before you begin, ensure you have the following installed:
 Follow these [steps](local.md)
 
 
-### 3. Configure the database
-
-Create a PostgreSQL database and configure the connection string:
-
-- Create a `.env` file in the root directory
-- Add the following environment variables:
-
-```
-DATABASE_URL=postgresql://traveltracker:traveltrackerpassword@localhost:5432/travel_tracker
-SESSION_SECRET=your_session_secret_here
-```
-
-still WIP untill fix local environment well using local postgree
-;DATABASE_URL=postgresql://traveltracker:traveltrackerpassword@localhost:5432/travel_tracker
-
-
-Replace `username`, `password`, and `travel_tracker` with your PostgreSQL credentials and desired database name.
-
-#### 3.2 Load on the env
-```
-export $(cat .env | xargs)
-echo $DATABASE_URL
-```
-
-#### 3.3 Create database if doesn't exist yet
-```
-psql "postgresql://traveltracker:traveltrackerpassword@localhost:5432/postgres" -c "CREATE DATABASE travel_tracker;"
-```
-
-### 4. Set up the database schema
-
-Run the Drizzle migrations to set up your database schema:
-
-```bash
-npm run db:push
-```
-
-### 5. Start the development server
-
-```bash
-npm run dev
-```
-
-This will start both the frontend and backend servers. The application will be available at [http://localhost:5000](http://localhost:5000).
-
 ## Project Structure
 
 - `/client` - Frontend React application
