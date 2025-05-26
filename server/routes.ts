@@ -4,10 +4,14 @@ import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { z } from "zod";
 import { insertVisitSchema } from "@shared/schema";
+import { setupSwagger } from "./swagger";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes
   setupAuth(app);
+
+  // Setup Swagger API documentation
+  setupSwagger(app);
 
   // Middleware to check for authentication
   const isAuthenticated = (req: any, res: any, next: any) => {
@@ -17,14 +21,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(401).json({ message: "Unauthorized" });
   };
 
-  // Get all visits for the authenticated user
+  /**
+   * @swagger
+   * /visits:
+   *   get:
+   *     summary: Get all visits for the authenticated user
+   *     description: Retrieve a list of all countries, cities, and places the authenticated user has visited
+   *     tags: [Visits]
+   *     security:
+   *       - sessionAuth: []
+   *     responses:
+   *       200:
+   *         description: List of visits retrieved successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 $ref: '#/components/schemas/Visit'
+   *       401:
+   *         description: User not authenticated
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   */
   app.get("/api/visits", isAuthenticated, async (req, res) => {
     const userId = req.user!.id;
     const visits = await storage.getVisitsByUserId(userId);
     res.json(visits);
   });
 
-  // Add a new visit
+  /**
+   * @swagger
+   * /visits:
+   *   post:
+   *     summary: Add a new visit
+   *     description: Record a new visit to a country, city, or place
+   *     tags: [Visits]
+   *     security:
+   *       - sessionAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required: [countryCode, countryName, visitMonth, visitYear]
+   *             properties:
+   *               countryCode:
+   *                 type: string
+   *                 description: ISO 2-letter country code
+   *                 example: "CZ"
+   *               countryName:
+   *                 type: string
+   *                 description: Full country name
+   *                 example: "Czech Republic"
+   *               state:
+   *                 type: string
+   *                 description: State or province visited
+   *                 example: "Prague"
+   *                 nullable: true
+   *               city:
+   *                 type: string
+   *                 description: City visited
+   *                 example: "Prague"
+   *                 nullable: true
+   *               visitMonth:
+   *                 type: integer
+   *                 description: Month of visit (1-12)
+   *                 example: 6
+   *               visitYear:
+   *                 type: integer
+   *                 description: Year of visit
+   *                 example: 2024
+   *               notes:
+   *                 type: string
+   *                 description: Personal notes about the visit
+   *                 example: "Beautiful architecture and great food!"
+   *                 nullable: true
+   *     responses:
+   *       201:
+   *         description: Visit created successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Visit'
+   *       400:
+   *         description: Invalid request data
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       401:
+   *         description: User not authenticated
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   */
   app.post("/api/visits", isAuthenticated, async (req, res) => {
     try {
       const userId = req.user!.id;
