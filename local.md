@@ -195,10 +195,95 @@ docker-compose down
 docker-compose logs -f postgres
 ```
 
+## Running Tests
+
+This project includes comprehensive unit tests for the business logic layer using Jest.
+
+### Available Test Commands
+
+```bash
+# Run all tests once
+npx jest
+
+# Run tests in watch mode (re-runs on file changes)
+npx jest --watch
+
+# Run tests with coverage report
+npx jest --coverage
+```
+
+### Test Structure
+
+Tests are located in `server/__tests__/` and cover:
+
+- **Auth Logic Tests** (`auth.test.ts`)
+  - Password hashing and comparison
+  - User authentication flow
+  - Security validation
+
+- **User Logic Tests** (`user.test.ts`)
+  - User creation and validation
+  - Share ID generation
+  - User retrieval operations
+
+- **Visit Logic Tests** (`visit.test.ts`)
+  - Visit creation and validation
+  - Visit retrieval and filtering
+  - Visit updates and deletion
+  - Access control verification
+
+### Running Individual Test Files
+
+```bash
+# Run specific test file
+npx jest server/__tests__/auth.test.ts
+
+# Run tests matching a pattern
+npx jest --testNamePattern="createUser"
+
+# Run tests in verbose mode
+npx jest --verbose
+```
+
+### Test Configuration
+
+- Tests use mocked storage layer to avoid database dependencies
+- Environment variables are set for testing in `server/__tests__/setup.ts`
+- Jest configuration is in `jest.config.js`
+
+### Writing New Tests
+
+When adding new business logic:
+1. Create corresponding test files in `server/__tests__/`
+2. Mock external dependencies (storage, APIs)
+3. Test both success and error scenarios
+4. Ensure proper error handling and validation
+
+## Code Quality & Architecture
+
+The server code is organized with clean separation of concerns:
+
+```
+server/
+├── logic/              # Pure business logic (unit tested)
+│   ├── auth.ts        # Authentication & password handling
+│   ├── user.ts        # User management operations
+│   ├── visit.ts       # Visit CRUD operations
+│   └── validation.ts  # Request validation middleware
+├── __tests__/         # Unit tests for logic layer
+└── routes.ts          # HTTP route handlers (thin layer)
+```
+
+This architecture makes the code:
+- **Testable** - Business logic is pure and easily unit tested
+- **Maintainable** - Clear separation between HTTP handling and business rules
+- **Reusable** - Logic can be used across different routes or contexts
+
 ## Next Steps
 
 - Create your user account at `http://localhost:5000/auth`
 - Start tracking your travels!
 - Explore the API at `http://localhost:5000/api-docs`
+- Run tests with `npx jest` to ensure everything works
 
 Happy coding! 🚀✈️
