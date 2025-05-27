@@ -38,7 +38,7 @@ Follow these [steps](local.md)
     - `/lib` - Utility functions and helpers
     - `/pages` - Page components
 - `/server` - Backend Express application
-  - API routes and server configuration
+  - logic, API routes and server configuration
 - `/shared` - Shared code between frontend and backend
   - Database schema definitions
 
