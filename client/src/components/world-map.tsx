@@ -325,7 +325,7 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
         
         setZoom(prevZoom => {
           const newZoom = prevZoom * zoomFactor;
-          return Math.max(80, Math.min(1000, newZoom)); // Wider zoom range
+          return Math.max(80, Math.min(2500, newZoom)); // Match the button zoom range
         });
         
         setLastTouchDistance(currentDistance);
@@ -372,11 +372,11 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
   }, []);
   
   const handleZoomIn = () => {
-    setZoom(prevZoom => Math.min(prevZoom + 50, 600)); // Limit maximum zoom level
+    setZoom(prevZoom => Math.min(prevZoom + 80, 2500)); // Much higher max zoom for small countries
   };
   
   const handleZoomOut = () => {
-    setZoom(prevZoom => Math.max(prevZoom - 50, 100)); // Limit minimum zoom level
+    setZoom(prevZoom => Math.max(prevZoom - 80, 80)); // Slightly lower min zoom
   };
   
   // Navigation buttons for panning
