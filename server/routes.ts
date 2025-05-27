@@ -13,13 +13,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Swagger API documentation
   setupSwagger(app);
 
-  // Middleware to check for authentication
-  const isAuthenticated = (req: any, res: any, next: any) => {
-    if (req.isAuthenticated()) {
-      return next();
-    }
-    res.status(401).json({ message: "Unauthorized" });
-  };
+  // Routes are now much cleaner with business logic extracted
 
   /**
    * @swagger
