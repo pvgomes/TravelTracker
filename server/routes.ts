@@ -1,10 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
 import { setupAuth } from "./auth";
-import { z } from "zod";
-import { insertVisitSchema } from "@shared/schema";
 import { setupSwagger } from "./swagger";
+import * as visitLogic from "./logic/visit";
+import * as userLogic from "./logic/user";
+import { requireAuth, validateVisitData, validateVisitId } from "./logic/validation";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes
