@@ -5,6 +5,7 @@ import session from "express-session";
 import { User as SelectUser } from "@shared/schema";
 import { hashPassword, comparePasswords, authenticateUser } from "./logic/auth";
 import * as userLogic from "./logic/user";
+import { storage } from "./storage";
 
 declare global {
   namespace Express {

@@ -2,9 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { setupSwagger } from "./swagger";
-import * as visitLogic from "./logic/visit";
-import * as userLogic from "./logic/user";
-import { requireAuth, validateVisitData, validateVisitId } from "./logic/validation";
+import { storage } from "./storage";
+import { z } from "zod";
+import { insertVisitSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes
@@ -13,7 +13,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Swagger API documentation
   setupSwagger(app);
 
-  // Routes are now much cleaner with business logic extracted
+  // Middleware to check for authentication
+  const isAuthenticated = (req: any, res: any, next: any) => {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.status(401).json({ message: "Unauthorized" });
+  };
 
   /**
    * @swagger
