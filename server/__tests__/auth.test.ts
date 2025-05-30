@@ -1,13 +1,13 @@
 import { hashPassword, comparePasswords, authenticateUser } from '../logic/auth';
 
 // Mock the storage module
-jest.mock('../storage', () => ({
-  storage: {
-    getUserByUsername: jest.fn(),
-  },
-}));
+const mockStorage = {
+  getUserByUsername: jest.fn(),
+};
 
-import { storage } from '../storage';
+jest.mock('../storage', () => ({
+  storage: mockStorage,
+}));
 
 describe('Auth Logic', () => {
   describe('hashPassword', () => {
@@ -49,8 +49,6 @@ describe('Auth Logic', () => {
   });
 
   describe('authenticateUser', () => {
-    const mockStorage = storage as jest.Mocked<typeof storage>;
-
     beforeEach(() => {
       jest.clearAllMocks();
     });

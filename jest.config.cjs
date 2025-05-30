@@ -1,13 +1,15 @@
 module.exports = {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default',
   testEnvironment: 'node',
   roots: ['<rootDir>/server'],
   testMatch: ['**/__tests__/**/*.test.ts'],
-  transform: {
-    '^.+\\.ts$': 'ts-jest',
-  },
-  moduleNameMapper: {
-    '^@shared/(.*)$': '<rootDir>/shared/$1',
-  },
-  setupFilesAfterEnv: ['<rootDir>/server/__tests__/setup.ts'],
+  moduleFileExtensions: ['ts', 'js'],
+  collectCoverageFrom: [
+    'server/logic/**/*.ts',
+    '!server/**/*.d.ts',
+  ],
+  testTimeout: 10000,
+  clearMocks: true,
+  resetMocks: true,
+  restoreMocks: true
 };
