@@ -1,4 +1,4 @@
-import { Layout } from "@/components/layout/layout";
+import { Layout } from "@components/layout/layout";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";

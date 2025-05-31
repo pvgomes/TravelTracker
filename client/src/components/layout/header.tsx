@@ -1,6 +1,6 @@
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@hooks/use-auth";
 
 // Simplified header to avoid potential issues
 export function Header() {

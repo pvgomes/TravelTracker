@@ -35,12 +35,11 @@
       "vite/client"
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@shared/*": [
-        "./shared/*"
-      ]
+      "@/*": ["./*"],
+      "@components/*": ["./components/*"],
+      "@hooks/*": ["./components/hooks/*"],
+      "@lib/*": ["./lib/*"],
+      "@shared/*": ["./shared/*"]
     },
     "isolatedModules": true,
     "target": "ES2017",
