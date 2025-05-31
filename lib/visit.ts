@@ -55,5 +55,5 @@ export async function deleteVisit(visitId: number, userId: number): Promise<bool
   const result = await db
     .delete(visits)
     .where(and(eq(visits.id, visitId), eq(visits.userId, userId)));
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 }
