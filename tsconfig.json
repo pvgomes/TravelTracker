@@ -1,7 +1,8 @@
 {
   "include": [
-    "client/src/**/*",
-    "server/**/*",
+    "app/**/*",
+    "components/**/*",
+    "lib/**/*",
     "shared/**/*",
     ".next/types/**/*.ts"
   ],
@@ -35,7 +36,7 @@
     ],
     "paths": {
       "@/*": [
-        "./client/src/*"
+        "./*"
       ],
       "@shared/*": [
         "./shared/*"
