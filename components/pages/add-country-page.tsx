@@ -1,6 +1,6 @@
-import { Layout } from "@/components/layout/layout";
+import { Layout } from "@/components/ui/layout/layout";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

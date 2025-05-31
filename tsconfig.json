@@ -37,9 +37,9 @@
     "paths": {
       "@/*": ["./*"],
       "@components/*": ["./components/*"],
-      "@hooks/*": ["./components/hooks/*"],
       "@lib/*": ["./lib/*"],
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["./shared/*"],
+      "@hooks/*": ["./components/hooks/*"]
     },
     "isolatedModules": true,
     "target": "ES2017",
