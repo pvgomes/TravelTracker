@@ -3,7 +3,7 @@ import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
 import session from "express-session";
-import { pool } from "./db";
+import { Pool } from "pg";
 import { randomBytes } from "crypto";
 
 // Define the interface for storage operations
@@ -33,8 +33,12 @@ export class DatabaseStorage implements IStorage {
 
   constructor() {
     const PostgresSessionStore = connectPg(session);
+    // Create a new pg.Pool instance for session store
+    const sessionPool = new Pool({
+      connectionString: process.env.DATABASE_URL, // or your connection config
+    });
     this.sessionStore = new PostgresSessionStore({ 
-      pool,
+      pool: sessionPool,
       createTableIfMissing: true
     });
   }
