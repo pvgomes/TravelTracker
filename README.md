@@ -1,5 +1,7 @@
 # Travel Tracker App
 
+version: v0
+
 A dynamic travel tracking web application that helps users document and explore global adventures through an interactive platform.
 
 ## Features
