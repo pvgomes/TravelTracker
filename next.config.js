@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    appDir: true,
     serverComponentsExternalPackages: ['@neondatabase/serverless']
   },
   env: {
@@ -12,4 +11,4 @@ const nextConfig = {
   }
 }
 
-module.exports = nextConfig
+export default nextConfig

@@ -15,19 +15,3 @@ export async function comparePasswords(supplied: string, stored: string): Promis
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
-
-export async function authenticateUser(username: string, password: string) {
-  const { storage } = await import("../storage");
-  
-  const user = await storage.getUserByUsername(username);
-  if (!user) {
-    return null;
-  }
-
-  const isValid = await comparePasswords(password, user.password);
-  if (!isValid) {
-    return null;
-  }
-
-  return user;
-}
