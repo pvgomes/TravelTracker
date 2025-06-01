@@ -1,1 +1,0 @@
-globalThis.__RSC_MANIFEST=(globalThis.__RSC_MANIFEST||{});globalThis.__RSC_MANIFEST["/_not-found/page"]={"moduleLoading":{"prefix":"/_next/"},"ssrModuleMapping":{},"edgeSSRModuleMapping":{},"clientModules":{},"entryCSSFiles":{"/Users/pvgomes/dev/TravelTracker/":[],"/Users/pvgomes/dev/TravelTracker/app/_not-found/page":[]},"rscModuleMapping":{},"edgeRscModuleMapping":{}}
