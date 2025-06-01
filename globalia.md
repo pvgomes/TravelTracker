@@ -73,3 +73,34 @@ Install Command: npm install
 Your application uses a custom Express.js setup with Vite, so it doesn't fit the standard Next.js or pure React templates. The build process creates both the client bundle and server bundle in the dist directory.
 
 The architecture follows modern full-stack patterns with strong type safety, clean separation of concerns, and scalable deployment-ready structure.
+
+
+
+### Production
+
+We use AWS Elastic Beanstalk
+
+Why Elastic Beanstalk:
+
+Handles deployment, capacity provisioning, load balancing, and health monitoring
+Supports Node.js applications out of the box
+Easy to set up and manage
+Can scale automatically
+Works well with your Express + PostgreSQL stack
+
+
+-- Create env
+
+This command could create a postgres on RDS by 14UDS/monthly 
+```
+eb create globalia-env --database.engine postgres \
+                      --database.instance db.t3.micro \
+                      --database.username traveltracker \
+                      --database.password YOUR_SECURE_PASSWORD
+```
+
+
+But I've decided to use NEON database in the beginning to avoid costs
+
+for that I've to run:
+`eb create globalia-env`
