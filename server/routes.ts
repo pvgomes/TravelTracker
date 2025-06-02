@@ -23,6 +23,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   /**
    * @swagger
+   * /health:
+   *   get:
+   *     summary: health check
+   *     tags: [health]
+   *     security:
+   *       - sessionAuth: []
+   *     responses:
+   *       200:
+   *         description: check health status
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 status:
+   *                   type: string
+   *                 uptime:
+   *                   type: number
+   *                 timestamp:
+   *                   type: string
+   *                   format: date-time
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   */
+  app.get("/health", (req, res) => {
+    res.status(200).json({
+      status: "healthy",
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  /**
+   * @swagger
    * /visits:
    *   get:
    *     summary: Get all visits for the authenticated user
