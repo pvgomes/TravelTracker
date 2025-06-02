@@ -104,3 +104,28 @@ But I've decided to use NEON database in the beginning to avoid costs
 
 for that I've to run:
 `eb create globalia-env`
+
+eb create travel-tracker-prod \
+  --timeout 20 \
+  --instance-types t3.micro
+
+
+```
+eb create travel-tracker-prod \
+  --timeout 20 \
+  --instance-types t3.micro \
+  --envvars \
+NODE_ENV=production,\
+PORT=8081,\
+USE_NEON=true,\
+DATABASE_URL="postgresql://neondb_owner:npg_XliKMRJna1m9@ep-small-frost-a6gdwf2f.us-west-2.aws.neon.tech/neondb?sslmode=require",\
+SESSION_SECRET="pv-ola-140525"
+```
+
+
+export NODE_ENV=production
+export PORT=8081
+export USE_NEON=true
+export DATABASE_URL="postgresql://neondb_owner:npg_XliKMRJna1m9@ep-small-frost-a6gdwf2f.us-west-2.aws.neon.tech/neondb?sslmode=require"
+export SESSION_SECRET="pv-ola-140525"
+npm run build

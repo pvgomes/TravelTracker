@@ -1,4 +1,0 @@
-{
-  "buildCommand": "npm run test && npm run build",
-  "outputDirectory": "dist/public"
-}
