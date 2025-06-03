@@ -1,6 +1,5 @@
 [build]
 builder = "nixpacks"
-nixpacksVersion = "1.38.0"
 buildCommand = "npm install --include=dev && npm run build"
 
 [deploy]

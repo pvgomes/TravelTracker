@@ -1,10 +1,13 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from 'url';
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
 import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const viteLogger = createLogger();
 
@@ -46,7 +49,7 @@ export async function setupVite(app: Express, server: Server) {
 
     try {
       const clientTemplate = path.resolve(
-        import.meta.dirname,
+        __dirname,
         "..",
         "client",
         "index.html",
@@ -68,18 +71,18 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+  const distPublicPath = path.resolve(__dirname, "..", "dist", "public");
 
-  if (!fs.existsSync(distPath)) {
+  if (!fs.existsSync(distPublicPath)) {
     throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+      `Could not find the build directory: ${distPublicPath}, make sure to build the client first`,
     );
   }
 
-  app.use(express.static(distPath));
+  app.use(express.static(distPublicPath));
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+    res.sendFile(path.resolve(distPublicPath, "index.html"));
   });
 }
