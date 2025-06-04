@@ -26,7 +26,7 @@ While **Globalia** is free to use, the platform will soon offer personalized tra
 * **Social Connection**: Share your travels with others and engage with the global community.
 * **Simple & Fun**: Documenting your travels has never been easier or more fun.
 
-**Globalia** is more than just a travel tracker; it’s a platform that connects you to your adventures and helps you share them with the world.
+**Globalia** is more than just a Globalia; it’s a platform that connects you to your adventures and helps you share them with the world.
 
 
 

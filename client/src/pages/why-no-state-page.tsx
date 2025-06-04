@@ -61,7 +61,7 @@ export default function WhyNoStatePage() {
             </ul>
             
             <p>
-              This is why our travel tracker makes the state/province field optional, allowing you to accurately record your travels regardless of the administrative structure of the places you've visited.
+              This is why our Globalia makes the state/province field optional, allowing you to accurately record your travels regardless of the administrative structure of the places you've visited.
             </p>
           </CardContent>
         </Card>

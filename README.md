@@ -1,4 +1,4 @@
-# Travel Tracker App
+# Globalia App
 
 version: v0
 

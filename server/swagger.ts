@@ -6,11 +6,11 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Travel Tracker API',
+      title: 'Globalia API',
       version: '1.0.0',
       description: 'A comprehensive API for tracking countries and places you have visited around the world',
       contact: {
-        name: 'Travel Tracker Support',
+        name: 'Globalia Support',
         email: 'support@traveltracker.com'
       }
     },
@@ -206,7 +206,7 @@ const specs = swaggerJSDoc(options);
 export function setupSwagger(app: Express) {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
     customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Travel Tracker API Documentation',
+    customSiteTitle: 'Globalia API Documentation',
     swaggerOptions: {
       persistAuthorization: true,
       displayRequestDuration: true,

@@ -1,6 +1,6 @@
-# Travel Tracker - Local Development Setup
+# Globalia - Local Development Setup
 
-This guide will help you run the Travel Tracker application locally using Docker for PostgreSQL.
+This guide will help you run the Globalia application locally using Docker for PostgreSQL.
 
 ## Prerequisites
 
