@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
-import AddCountryPage from "@/pages/add-country-page";
 import CountriesListPage from "@/pages/countries-list-page";
 import StatisticsPage from "@/pages/statistics-page";
 import WhyNoStatePage from "@/pages/why-no-state-page";
@@ -22,7 +21,6 @@ function Router() {
       <Route path="/why-no-state" component={WhyNoStatePage} />
       <Route path="/social/:shareId" component={SharedMapPage} />
       <ProtectedRoute path="/" component={HomePage} />
-      <ProtectedRoute path="/add" component={AddCountryPage} />
       <ProtectedRoute path="/countries" component={CountriesListPage} />
       <ProtectedRoute path="/statistics" component={StatisticsPage} />
       <Route component={NotFound} />
