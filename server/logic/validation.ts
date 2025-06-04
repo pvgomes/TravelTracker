@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 
 export function validateVisitData(req: Request, res: Response, next: NextFunction) {
   try {
-    const validatedData = insertVisitSchema.omit({ userId: true }).parse(req.body);
+    const validatedData = insertVisitSchema.parse(req.body);
     req.body = validatedData;
     next();
   } catch (error: any) {

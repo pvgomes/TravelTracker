@@ -24,10 +24,10 @@ export async function createVisit(userId: number, visitData: CreateVisitRequest)
     countryCode: validatedData.countryCode,
     countryName: validatedData.countryName,
     state: visitData.state || null,
-    city: visitData.city || null,
+    city: validatedData.city,
     visitMonth: validatedData.visitMonth,
     visitYear: validatedData.visitYear,
-    notes: visitData.notes || null,
+    notes: validatedData.notes ?? null,
   });
 
   return newVisit;

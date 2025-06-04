@@ -19,7 +19,9 @@ export interface IStorage {
   // Visit methods
   getVisitById(id: number): Promise<Visit | undefined>;
   getVisitsByUserId(userId: number): Promise<Visit[]>;
-  createVisit(visit: Omit<Visit, 'id'>): Promise<Visit>;
+  createVisit(
+    visit: Omit<Visit, 'id' | 'visitDate'> & { visitDate?: string | null }
+  ): Promise<Visit>;
   updateVisit(id: number, visit: Partial<Omit<Visit, 'id' | 'userId'>>): Promise<Visit | undefined>;
   deleteVisit(id: number): Promise<boolean>;
   
@@ -125,7 +127,9 @@ export class DatabaseStorage implements IStorage {
     return userVisits;
   }
 
-  async createVisit(visit: Omit<Visit, 'id'>): Promise<Visit> {
+  async createVisit(
+    visit: Omit<Visit, 'id' | 'visitDate'> & { visitDate?: string | null }
+  ): Promise<Visit> {
     const [newVisit] = await db
       .insert(visits)
       .values({
