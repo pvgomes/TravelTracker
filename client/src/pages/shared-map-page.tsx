@@ -122,6 +122,9 @@ export default function SharedMapPage() {
             <p className="text-gray-600 dark:text-gray-400 mt-1">
               Explore {data.fullName}'s journey across {countryCount} countries and {cityCount} cities!
             </p>
+            <p className="mt-1 text-muted-foreground">
+              Create your own map on Globalia and track your travels!
+            </p>
           </div>
           <Button variant="outline" size="sm" onClick={copyShareLink}>
             <Share2Icon className="mr-2 h-4 w-4" />

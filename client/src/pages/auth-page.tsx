@@ -98,12 +98,8 @@ export default function AuthPage() {
       >
         <div className="h-full w-full bg-black bg-opacity-40 flex items-center justify-center">
           <div className="text-center max-w-2xl p-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 font-montserrat">
-              Track Your World Adventures
-            </h1>
-            <p className="text-lg text-white opacity-90 mb-4">
-              Track the places you've visited in the world, share with your friends and see where is still missing to go.
-            </p>
+            <h1 className="font-bold text-3xl text-primary mb-2">Globalia</h1>
+            <p className="text-muted-foreground">Track your world adventures</p>
             <p className="text-md text-white opacity-80">
               Create your personalized travel map, discover your next destinations, and connect with fellow travelers.
             </p>
