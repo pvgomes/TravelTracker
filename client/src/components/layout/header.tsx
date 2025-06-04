@@ -15,7 +15,7 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:pl-64">
         <div className="flex justify-between h-16">
           <div className="flex items-center pl-2 sm:pl-0">
-            <h1 className="font-montserrat font-bold text-2xl text-primary">TravelTracker</h1>
+            <h1 className="font-montserrat font-bold text-2xl text-primary">Globalia</h1>
           </div>
           
           <div className="flex items-center">

@@ -11,7 +11,7 @@ const options = {
       description: 'A comprehensive API for tracking countries and places you have visited around the world',
       contact: {
         name: 'Globalia Support',
-        email: 'support@traveltracker.com'
+        email: 'support@Globalia.com'
       }
     },
     servers: [

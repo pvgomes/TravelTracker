@@ -111,7 +111,7 @@ export default function AuthPage() {
         <Card className="w-full max-w-md">
           <CardContent className="pt-6">
             <div className="text-center mb-8">
-              <h1 className="font-bold text-3xl text-primary mb-2">TravelTracker</h1>
+              <h1 className="font-bold text-3xl text-primary mb-2">Globalia</h1>
               <p className="text-muted-foreground">Track your world adventures</p>
             </div>
             
