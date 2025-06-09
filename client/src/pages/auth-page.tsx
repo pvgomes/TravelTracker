@@ -99,7 +99,9 @@ export default function AuthPage() {
         <div className="h-full w-full bg-black bg-opacity-40 flex items-center justify-center">
           <div className="text-center max-w-2xl p-8">
             <h1 className="font-bold text-3xl text-primary mb-2">Globalia</h1>
-            <p className="text-muted-foreground">Track your world adventures</p>
+            <p className="text-lg" style={{ color: "#F8E081", textShadow: "0 1px 8px #4A90E2" }}>
+              Track your world adventures
+            </p>
             <p className="text-md text-white opacity-80">
               Create your personalized travel map, discover your next destinations, and connect with fellow travelers.
             </p>
@@ -111,8 +113,24 @@ export default function AuthPage() {
         <Card className="w-full max-w-md">
           <CardContent className="pt-6">
             <div className="text-center mb-8">
-              <h1 className="font-bold text-3xl text-primary mb-2">Globalia</h1>
-              <p className="text-muted-foreground">Track your world adventures</p>
+              <div className="flex flex-col items-center space-y-2">
+                <img 
+                  src="/web-logo-globalia-crop.png"
+                  alt="Globalia Logo" 
+                  className="h-12 w-auto mb-2 object-contain"
+                  loading="eager"
+                  // fallback if image fails to load
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    // Show text fallback
+                    const textElement = document.createElement('h1');
+                    textElement.className = 'font-bold text-3xl text-primary';
+                    textElement.innerText = 'Globalia';
+                    e.currentTarget.parentNode?.appendChild(textElement);
+                  }}
+                />
+                <p className="text-muted-foreground">Track your world adventures</p>
+              </div>
             </div>
             
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "login" | "register")}>
