@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 import { CountrySearch } from "@/components/country-search";
 import { Label } from "@/components/ui/label";
+import { CommonDialog } from "@/components/common-dialog"
 
 const loginSchema = insertUserSchema;
 const registerSchema = insertUserSchema;
@@ -22,6 +23,12 @@ export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [_, setLocation] = useLocation();
   const { user, loginMutation, registerMutation } = useAuth();
+
+  // Add state for dialog control
+  const [dialogState, setDialogState] = useState<{ open: boolean; type: "terms" | "privacy" }>({
+    open: false,
+    type: "terms"
+  });
 
   // Redirect if user is already logged in
   useEffect(() => {
@@ -284,13 +291,28 @@ export default function AuthPage() {
                         className="text-sm text-muted-foreground"
                       >
                         I agree to the{" "}
-                        <Button variant="link" className="p-0 h-auto text-sm" type="button">
-                          Terms of Service
-                        </Button>{" "}
-                        and{" "}
-                        <Button variant="link" className="p-0 h-auto text-sm" type="button">
-                          Privacy Policy
-                        </Button>
+                      <Button 
+                        variant="link" 
+                        className="p-0 h-auto text-sm" 
+                        type="button"
+                        onClick={() => setDialogState({ open: true, type: "terms" })}
+                      >
+                        Terms of Service
+                      </Button>
+                      {" "}and{" "}
+                      <Button 
+                        variant="link" 
+                        className="p-0 h-auto text-sm" 
+                        type="button"
+                        onClick={() => setDialogState({ open: true, type: "privacy" })}
+                      >
+                        Privacy Policy
+                      </Button>
+                      <CommonDialog
+                        open={dialogState.open}
+                        onOpenChange={(open) => setDialogState(prev => ({ ...prev, open }))}
+                        type={dialogState.type}
+                      />
                       </label>
                     </div>
                     
