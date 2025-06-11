@@ -26,7 +26,7 @@ export function StatsOverview({ visits, homeCountryCode }: ExtendedStatsOverview
   const countryCodesSet = new Set<string>();
   visits.forEach(visit => countryCodesSet.add(visit.countryCode));
   
-  // Add home country to the set of visited countries if it exists and not already added
+  // Add born country to the set of visited countries if it exists and not already added
   if (homeCountryCode && !countryCodesSet.has(homeCountryCode)) {
     countryCodesSet.add(homeCountryCode);
   }
@@ -47,7 +47,7 @@ export function StatsOverview({ visits, homeCountryCode }: ExtendedStatsOverview
     }
   });
   
-  // Add home country's continent if it exists
+  // Add born country's continent if it exists
   if (homeCountryCode) {
     const homeCountry = getCountryByCode(homeCountryCode);
     if (homeCountry?.continent) {

@@ -454,7 +454,7 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
       });
     });
     
-    // Add home country if provided
+    // Add born country if provided
     if (homeCountryCode) {
       codes2.add(homeCountryCode);
       
@@ -462,7 +462,7 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
         names.add(homeCountryName);
       }
       
-      // Find the 3-letter code for the home country
+      // Find the 3-letter code for the born country
       Object.entries(countryMapping).forEach(([name, codes]) => {
         if (name === homeCountryName || codes[0] === homeCountryCode) {
           if (codes[1]) codes3.add(codes[1]); // Add 3-letter code
@@ -598,7 +598,7 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
                 visitStatus = getCountryVisitStatus(matchedCountryCode, visits);
               }
               
-              // Check if this is the home country
+              // Check if this is the born country
               const isHomeCountry = 
                 (homeCountryCode && (
                   iso_a2 === homeCountryCode || 
@@ -614,7 +614,7 @@ export function WorldMap({ visits, homeCountryCode, homeCountryName }: WorldMapP
               let strokeColor = "#FFFFFF";
               
               if (isHomeCountry) {
-                fillColor = "#f97316"; // Orange for home country
+                fillColor = "#f97316"; // Orange for born country
                 hoverFillColor = "#ea580c";
               } else if (visitStatus === 'visited') {
                 fillColor = "#10b981"; // Green for visited countries

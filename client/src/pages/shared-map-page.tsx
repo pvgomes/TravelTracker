@@ -79,7 +79,7 @@ export default function SharedMapPage() {
   // Get counts and statistics
   const visitedCountryCodes = new Set(data.visits.map(v => v.countryCode));
   
-  // Add home country to statistics if it exists
+  // Add born country to statistics if it exists
   if (data.homeCountryCode && !visitedCountryCodes.has(data.homeCountryCode)) {
     visitedCountryCodes.add(data.homeCountryCode);
   }
@@ -204,7 +204,7 @@ export default function SharedMapPage() {
                     <HomeIcon className="h-5 w-5 text-white" />
                   </div>
                   <div className="ml-5 w-0 flex-1">
-                    <div className="text-sm font-medium text-muted-foreground truncate">Home Country</div>
+                    <div className="text-sm font-medium text-muted-foreground truncate">born country</div>
                     <div className="text-lg font-semibold truncate">{data.homeCountryName}</div>
                   </div>
                 </div>
@@ -216,21 +216,21 @@ export default function SharedMapPage() {
         {/* Map */}
         <div className="bg-white dark:bg-card overflow-hidden shadow rounded-lg p-4 mb-8">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-medium">Travel Map</h3>
+            <h3 className="text-lg font-medium">travel map</h3>
             <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-y-1">
               <div className="flex items-center mr-2">
                 <span className="inline-block w-3 h-3 bg-[#10b981] rounded-full mr-1"></span>
-                <span>Visited</span>
+                <span>visited</span>
               </div>
               {data.homeCountryCode && (
                 <div className="flex items-center mr-2">
                   <span className="inline-block w-3 h-3 bg-orange-500 rounded-full mr-1"></span>
-                  <span>Home Country</span>
+                  <span>born country</span>
                 </div>
               )}
               <div className="flex items-center">
                 <span className="inline-block w-3 h-3 bg-neutral-200 dark:bg-muted rounded-full mr-1"></span>
-                <span>Not visited</span>
+                <span>not visited</span>
               </div>
             </div>
           </div>

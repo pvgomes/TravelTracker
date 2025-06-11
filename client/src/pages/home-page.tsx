@@ -112,7 +112,7 @@ export default function HomePage() {
             {user?.homeCountryCode && (
               <div className="flex items-center mr-2">
                 <span className="inline-block w-3 h-3 bg-orange-500 rounded-full mr-1"></span>
-                <span>Home Country</span>
+                <span>born country</span>
               </div>
             )}
             <div className="flex items-center">

@@ -39,12 +39,12 @@ const options = {
             },
             homeCountryCode: {
               type: 'string',
-              description: 'ISO 2-letter code of user home country',
+              description: 'ISO 2-letter code of user born country',
               nullable: true
             },
             homeCountryName: {
               type: 'string',
-              description: 'Name of user home country',
+              description: 'Name of user born country',
               nullable: true
             },
             shareId: {
@@ -128,12 +128,12 @@ const options = {
             },
             homeCountryCode: {
               type: 'string',
-              description: 'ISO 2-letter code of user home country',
+              description: 'ISO 2-letter code of user born country',
               nullable: true
             },
             homeCountryName: {
               type: 'string',
-              description: 'Name of user home country',
+              description: 'Name of user born country',
               nullable: true
             }
           }

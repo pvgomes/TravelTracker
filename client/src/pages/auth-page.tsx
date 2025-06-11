@@ -49,7 +49,7 @@ export default function AuthPage() {
     name: string;
   } | null>(null);
   
-  // Register form with extended schema to include full name and home country
+  // Register form with extended schema to include full name and born country
   const extendedRegisterSchema = registerSchema.extend({
     fullName: z.string().min(2, "Name must be at least 2 characters").optional(),
     homeCountryCode: z.string().optional(),
@@ -257,13 +257,13 @@ export default function AuthPage() {
                     />
                     
                     <div className="space-y-2">
-                      <Label htmlFor="homeCountry">Home Country</Label>
+                      <Label htmlFor="homeCountry">born country</Label>
                       <CountrySearch 
                         onCountrySelect={(country) => setSelectedHomeCountry(country)}
                         selectedCountryCode={selectedHomeCountry?.code}
                       />
                       <p className="text-xs text-muted-foreground mt-1">
-                        Select your home country to mark it on the map
+                        Select your born country to mark it on the map
                       </p>
                       
                       {/* Hidden fields to store country code and name */}

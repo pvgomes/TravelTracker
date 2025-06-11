@@ -106,14 +106,14 @@ export default function StatisticsPage() {
     }
   });
   
-  // Add home country if it exists and is not already counted
+  // Add born country if it exists and is not already counted
   if (user?.homeCountryCode && !uniqueCountryCodes.has(user.homeCountryCode)) {
     const homeContinent = countryToContinentMap[user.homeCountryCode] || "Unknown";
     
-    // Count home country in its continent
+    // Count born country in its continent
     continentCounts[homeContinent] = (continentCounts[homeContinent] || 0) + 1;
     
-    // Store home country in its continent list
+    // Store born country in its continent list
     if (!countriesByContinent[homeContinent]) {
       countriesByContinent[homeContinent] = [];
     }
@@ -169,7 +169,7 @@ export default function StatisticsPage() {
         {user?.homeCountryName && (
           <Badge variant="outline" className="flex items-center gap-1 text-sm py-1">
             <Home className="h-3.5 w-3.5 text-orange-500" />
-            <span>Home: {user.homeCountryName}</span>
+            <span>born: {user.homeCountryName}</span>
           </Badge>
         )}
       </div>
