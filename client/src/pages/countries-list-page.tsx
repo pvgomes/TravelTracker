@@ -7,9 +7,11 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { FlagIcon, MapPinIcon, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CountryInfoDialog } from "@/components/country-info-dialog"
 
 export default function CountriesListPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   
   const { data: visits = [], isLoading } = useQuery<Visit[]>({
     queryKey: ["/api/visits"],
@@ -75,10 +77,20 @@ export default function CountriesListPage() {
                         <p className="text-sm mt-1 text-muted-foreground italic">{visit.notes}</p>
                       )}
                     </div>
-                    <Button size="sm" variant="outline">
-                      <MapPinIcon className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
+                   <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => setSelectedCountry(visit.countryCode)}
+                      >
+                        <MapPinIcon className="h-4 w-4 mr-1" />
+                        View
+                      </Button>
+
+                      <CountryInfoDialog
+                        open={!!selectedCountry}
+                        onOpenChange={(open) => !open && setSelectedCountry(null)}
+                        countryCode={selectedCountry || ""}
+                      />
                   </div>
                 ))}
               </div>
