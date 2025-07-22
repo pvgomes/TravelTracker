@@ -76,11 +76,18 @@ export default function SharedMapPage() {
     return new Date(b.visitDate as string).getTime() - new Date(a.visitDate as string).getTime();
   });
   
-  // Get counts and statistics
   const visitedCountryCodes = new Set(data.visits.map(v => v.countryCode));
-  
-  // Add born country to statistics if it exists
-  if (data.homeCountryCode && !visitedCountryCodes.has(data.homeCountryCode)) {
+
+  // Only add home country if there is at least one visit for it
+  const hasVisitForHomeCountry =
+    !!data.homeCountryCode &&
+    data.visits.some(v => v.countryCode === data.homeCountryCode);
+
+  if (
+    data.homeCountryCode &&
+    !visitedCountryCodes.has(data.homeCountryCode) &&
+    hasVisitForHomeCountry
+  ) {
     visitedCountryCodes.add(data.homeCountryCode);
   }
   
@@ -117,7 +124,7 @@ export default function SharedMapPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white font-montserrat">
-              {data.fullName}'s Travel Map
+              {data.fullName}'s travel map
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
               Explore {data.fullName}'s journey across {countryCount} countries and {cityCount} cities!
