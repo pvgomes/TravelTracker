@@ -100,21 +100,14 @@ export default function SharedMapPage() {
   const countryCount = visitedCountryCodes.size;
   const cityCount = data.visits.length;
   
-  // Calculate continents explored
-  const continentMapping: Record<string, string> = {
-    'US': 'North America', 'CA': 'North America', 'MX': 'North America', 
-    'BR': 'South America', 'AR': 'South America', 'CO': 'South America',
-    'GB': 'Europe', 'FR': 'Europe', 'DE': 'Europe', 'IT': 'Europe', 'ES': 'Europe',
-    'CN': 'Asia', 'JP': 'Asia', 'IN': 'Asia', 'RU': 'Asia',
-    'AU': 'Oceania', 'NZ': 'Oceania',
-    'ZA': 'Africa', 'EG': 'Africa', 'NG': 'Africa',
-    'AQ': 'Antarctica'
-  };
-  
+  // Calculate continents explored using our complete countries database
   const continentsExplored = new Set(
     Array.from(visitedCountryCodes)
-      .map(code => continentMapping[code] || 'Unknown')
-      .filter(continent => continent !== 'Unknown')
+      .map(code => {
+        const country = getCountryByCode(code);
+        return country?.continent;
+      })
+      .filter(continent => continent)
   );
   
   // Get country flag emojis for visited countries using our countries data
