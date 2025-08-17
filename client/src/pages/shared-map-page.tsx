@@ -112,7 +112,6 @@ export default function SharedMapPage() {
   
   // Get country flag emojis for visited countries using our countries data
   const countryFlags = Array.from(visitedCountryCodes)
-    .slice(0, 10) // Limit to first 10 countries to avoid overcrowding
     .map(code => {
       const country = getCountryByCode(code);
       return country?.flag || '🏳️';
